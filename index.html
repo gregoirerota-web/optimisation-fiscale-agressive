@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SimFisc — Optimisation Fiscale Agressive : Mécanismes et Conséquences</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --accent: #e8c547;
+    --accent2: #f97316;
+    --state: #22c55e;
+    --corp: #3b82f6;
+    --offshore: #a855f7;
+    --danger: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --border: #1e293b;
+    --card: #131d31;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--text); font-weight: 400; }
+
+  .phase-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg2);
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .phase-tab {
+    padding: 6px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    border: none;
+    background: transparent;
+    transition: all 0.2s;
+    font-family: 'IBM Plex Sans', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .phase-tab.active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .app { display: flex; height: calc(100vh - 60px); }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 16px 0;
+  }
+
+  .sidebar-section {
+    padding: 0 16px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .scenario-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+  }
+
+  .scenario-btn:hover { background: var(--bg3); }
+  .scenario-btn.active { background: var(--card); border-left: 3px solid var(--accent); padding-left: 9px; }
+
+  .scenario-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-base { background: var(--state); }
+  .dot-agressive { background: var(--danger); }
+  .dot-counter { background: var(--corp); }
+
+  .scenario-tag {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+    font-weight: 600;
+  }
+  .tag-base { background: rgba(34,197,94,0.15); color: var(--state); }
+  .tag-agr { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .tag-ctr { background: rgba(59,130,246,0.15); color: var(--corp); }
+
+  /* ─── MAIN CONTENT ─── */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  /* ─── PHASE 1: EXPLORATION ─── */
+  .scenario-view { padding: 32px; max-width: 1100px; }
+
+  .scenario-header {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .scenario-type-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .badge-base { background: rgba(34,197,94,0.15); color: var(--state); border: 1px solid rgba(34,197,94,0.3); }
+  .badge-agr { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+  .badge-ctr { background: rgba(59,130,246,0.15); color: var(--corp); border: 1px solid rgba(59,130,246,0.3); }
+
+  .scenario-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .scenario-subtitle { color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 700px; }
+
+  /* ─── FINANCIAL CARDS ─── */
+  .entities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .entity-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .entity-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .entity-flag { font-size: 20px; }
+
+  .entity-name {
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .entity-subtitle { font-size: 11px; color: var(--muted); }
+
+  .entity-tax-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .tax-high { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .tax-zero { background: rgba(168,85,247,0.15); color: var(--offshore); }
+  .tax-low { background: rgba(232,197,71,0.15); color: var(--accent); }
+
+  .entity-body { padding: 16px 18px; }
+
+  .fin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+  }
+
+  .fin-row:last-child { border-bottom: none; }
+
+  .fin-label { color: var(--muted); }
+
+  .fin-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .val-positive { color: var(--state); }
+  .val-negative { color: var(--danger); }
+  .val-neutral { color: var(--text); }
+  .val-accent { color: var(--accent); }
+
+  .fin-separator {
+    border-top: 1px solid var(--border);
+    margin: 8px 0;
+  }
+
+  .fin-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  /* ─── FLOW DIAGRAM ─── */
+  .flow-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .flow-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .flow-diagram { position: relative; min-height: 160px; }
+
+  .flow-node {
+    position: absolute;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 130px;
+  }
+
+  .flow-node-label { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  .flow-node-value { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; }
+  .flow-node-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  svg.flow-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* ─── KPI STRIP ─── */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .kpi-state::after { background: var(--state); }
+  .kpi-corp::after { background: var(--corp); }
+  .kpi-offshore::after { background: var(--offshore); }
+  .kpi-beps::after { background: var(--accent2); }
+
+  .kpi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 8px; }
+  .kpi-value { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700; }
+  .kpi-delta { font-size: 11px; margin-top: 4px; }
+  .delta-neg { color: var(--danger); }
+  .delta-pos { color: var(--state); }
+
+  /* ─── THEORY BOX ─── */
+  .theory-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+
+  .theory-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .theory-body { color: #94a3b8; line-height: 1.7; font-size: 13px; }
+
+  .theory-body p { margin-bottom: 10px; }
+  .theory-body p:last-child { margin-bottom: 0; }
+
+  .ref-list { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .ref-item {
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.5;
+  }
+
+  .ref-item strong { color: #94a3b8; font-style: normal; }
+
+  /* ─── NAVIGATION ─── */
+  .nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover { background: var(--bg3); border-color: var(--accent); color: var(--accent); }
+  .nav-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+  .nav-btn.primary:hover { background: #d4b03e; }
+
+  /* ─── PHASE 2: SIMULATION ─── */
+  .sim-view { padding: 32px; }
+
+  .sim-header { margin-bottom: 28px; }
+
+  .sim-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
+
+  .controls-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+  }
+
+  .panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 16px; }
+
+  .control-group { margin-bottom: 18px; }
+
+  .control-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 8px;
+  }
+
+  .control-value {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+  }
+
+  .strategy-toggles { margin-bottom: 18px; }
+
+  .toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+
+  .toggle-item:hover { border-color: var(--accent); }
+  .toggle-item.active { border-color: var(--accent2); background: rgba(249,115,22,0.08); }
+
+  .toggle-label { font-size: 12px; font-weight: 500; }
+  .toggle-sublabel { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  .toggle-switch {
+    width: 32px;
+    height: 18px;
+    border-radius: 9px;
+    background: var(--border);
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch.on { background: var(--accent2); }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: white;
+    transition: transform 0.2s;
+  }
+
+  .toggle-switch.on::after { transform: translateX(14px); }
+
+  .results-panel { }
+
+  /* ─── BAR CHART ─── */
+  .chart-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .chart-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bar-label { width: 140px; font-size: 12px; color: #94a3b8; flex-shrink: 0; }
+
+  .bar-track {
+    flex: 1;
+    height: 28px;
+    background: var(--bg2);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    color: rgba(0,0,0,0.8);
+  }
+
+  .bar-value { width: 60px; text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }
+
+  /* ─── CONSEQUENCES TABLE ─── */
+  .consequences-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+  .consequences-table th {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .consequences-table th:first-child { border-radius: 8px 0 0 0; }
+  .consequences-table th:last-child { border-radius: 0 8px 0 0; }
+
+  .consequences-table td {
+    padding: 10px 14px;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+
+  .consequences-table tr:last-child td { border-bottom: none; }
+  .consequences-table tr.highlight td { background: rgba(249,115,22,0.06); }
+
+  .change-badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .badge-down { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .badge-up { background: rgba(34,197,94,0.15); color: var(--state); }
+  .badge-neutral { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+  /* ─── WARNING BOX ─── */
+  .warning-box {
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .warning-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .warning-text { font-size: 12px; color: #94a3b8; line-height: 1.6; }
+  .warning-text strong { color: var(--accent2); }
+
+  /* ─── INTRO SCREEN ─── */
+  .intro-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .intro-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .intro-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    max-width: 700px;
+  }
+
+  .intro-title em { color: var(--accent); font-style: normal; }
+
+  .intro-subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 580px;
+    margin-bottom: 40px;
+  }
+
+  .intro-context {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 28px;
+    max-width: 580px;
+    text-align: left;
+    margin-bottom: 40px;
+  }
+
+  .context-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 12px; }
+
+  .context-body { font-size: 13px; color: #94a3b8; line-height: 1.7; }
+
+  .start-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 16px 48px;
+    border-radius: 10px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .start-btn:hover { background: #d4b03e; transform: translateY(-2px); }
+
+  /* ─── PROGRESS ─── */
+  .progress-bar-outer {
+    height: 3px;
+    background: var(--bg2);
+    border-radius: 2px;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* ─── COMPARISON TABLE ─── */
+  .comparison-section {
+    padding: 32px;
+    max-width: 1100px;
+  }
+
+  .comp-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+  .comp-table th {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    padding: 12px 16px;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .comp-table th:first-child { text-align: left; border-radius: 8px 0 0 0; }
+  .comp-table th:last-child { border-radius: 0 8px 0 0; }
+
+  .comp-table td {
+    padding: 11px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  .comp-table td:first-child {
+    text-align: left;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .comp-table tr.base-row td { background: rgba(34,197,94,0.05); }
+  .comp-table tr.agr-row td { background: rgba(239,68,68,0.04); }
+  .comp-table tr.ctr-row td { background: rgba(59,130,246,0.04); }
+  .comp-table tr.hover-row:hover td { background: rgba(255,255,255,0.03); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in { animation: fadeIn 0.35s ease forwards; }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .live-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--state);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse-dot 2s infinite;
+  }
+
+  .hidden { display: none; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sim-grid { grid-template-columns: 1fr; }
+    .kpi-strip { grid-template-columns: repeat(2,1fr); }
+    .entities-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     INTRO SCREEN
+═══════════════════════════════════════════════════════ -->
+<div class="intro-screen" id="introScreen">
+  <p class="intro-eyebrow">Simulation pédagogique · Fiscalité internationale</p>
+  <h1 class="intro-title">L'optimisation fiscale agressive :<br><em>mécanismes et conséquences</em></h1>
+  <p class="intro-subtitle">Un jeu de simulation basé sur un cas réel d'entreprise minière en Afrique subsaharienne. Explorez les mécanismes d'érosion fiscale et leurs conséquences pour les États en développement.</p>
+
+  <div class="intro-context">
+    <p class="context-title">⚙ Contexte du cas</p>
+    <p class="context-body">Une mine au <strong>Burkina Faso</strong> appartient à un actionnaire étranger. L'entreprise génère un chiffre d'affaires de <strong>300 M</strong> et paye initialement <strong>12 M d'impôts</strong> à l'État hôte (IS = 20%). Différentes stratégies d'optimisation fiscale permettent à l'actionnaire de réduire cette charge au détriment des recettes publiques.<br><br>Vous allez explorer chaque mécanisme, comprendre son fonctionnement, et dans la Phase 2, simuler vos propres choix.</p>
+  </div>
+
+  <button class="start-btn" onclick="startApp()">Commencer la simulation →</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════════ -->
+<div id="mainApp" class="hidden">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">SimFisc <span>· Fiscalité Internationale</span></div>
+    <div class="phase-tabs">
+      <button class="phase-tab active" id="tab1" onclick="switchPhase(1)">Phase 1 — Exploration</button>
+      <button class="phase-tab" id="tab2" onclick="switchPhase(2)">Phase 2 — Simulation</button>
+      <button class="phase-tab" id="tab3" onclick="switchPhase(3)">Comparatif</button>
+    </div>
+  </header>
+
+  <div class="app">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Référence</span>
+        <button class="scenario-btn active" id="sbn-0" onclick="showScenario(0)">
+          <span class="scenario-dot dot-base"></span>
+          Situation initiale
+          <span class="scenario-tag tag-base">BASE</span>
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-label">Stratégies agressives</span>
+        <button class="scenario-btn" id="sbn-1" onclick="showScenario(1)">
+          <span class="scenario-dot dot-agressive"></span>
+          Prix de transfert
+          <span class="scenario-tag tag-agr">AGR</span>
+        </button>
+        <button class="scenario-btn" id="sbn-2" onclick="showScenario(2)">
+          <span class="scenario-dot dot-agressive"></span>
+          Sous-capitalisation
+          <span class="scenario-tag tag-agr">AGR</span>
+        </button>
+        <button class="scenario-btn" id="sbn-3" onclick="showScenario(3)">
+          <span class="scenario-dot dot-agressive"></span>
+          Hedging (6e méthode)
+          <span class="scenario-tag tag-agr">AGR</span>
+        </button>
+        <button class="scenario-btn" id="sbn-4" onclick="showScenario(4)">
+          <span class="scenario-dot dot-agressive"></span>
+          Retenue à la source
+          <span class="scenario-tag tag-agr">AGR</span>
+        </button>
+        <button class="scenario-btn" id="sbn-5" onclick="showScenario(5)">
+          <span class="scenario-dot dot-agressive"></span>
+          PT + Sous-cap. combinés
+          <span class="scenario-tag tag-agr">AGR</span>
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-label">Mesures correctives</span>
+        <button class="scenario-btn" id="sbn-6" onclick="showScenario(6)">
+          <span class="scenario-dot dot-counter"></span>
+          Pleine concurrence
+          <span class="scenario-tag tag-ctr">BEPS</span>
+        </button>
+        <button class="scenario-btn" id="sbn-7" onclick="showScenario(7)">
+          <span class="scenario-dot dot-counter"></span>
+          Règle de sous-capitalisation
+          <span class="scenario-tag tag-ctr">BEPS</span>
+        </button>
+        <button class="scenario-btn" id="sbn-8" onclick="showScenario(8)">
+          <span class="scenario-dot dot-counter"></span>
+          Règle de plafonnement des intérêts
+          <span class="scenario-tag tag-ctr">BEPS</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main content area -->
+    <main class="main" id="mainContent">
+      <!-- Content rendered by JS -->
+    </main>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA — extracted directly from Excel workbook
+// ═══════════════════════════════════════════════════════
+const SCENARIOS = [
+  {
+    id: 0,
+    key: 'base',
+    type: 'base',
+    title: 'Situation initiale',
+    subtitle: 'Mine au Burkina Faso — actionnaire étranger. Aucune optimisation fiscale. L\'entreprise paie 12 M d\'impôt sur les sociétés au taux normal de 20%.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Entreprise locale',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -200, cls: 'val-negative' },
+          { label: '— Achats', value: -50, cls: 'val-negative', sub: true },
+          { label: '— Salaires', value: -100, cls: 'val-negative', sub: true },
+          { label: '— DAP (amort.)', value: -50, cls: 'val-negative', sub: true },
+          { label: 'Charges financières', value: -40, cls: 'val-negative' },
+          { label: '— Intérêts', value: -40, cls: 'val-negative', sub: true },
+          { label: 'Bénéfice avant IS', value: 60, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés', value: -12, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: 48, cls: 'val-accent', bold: true },
+        ],
+        bilan: { actif: 500, passif: 500, cp: 100, dettes: 400, machine: 500 }
+      }
+    ],
+    kpis: {
+      stateRevenue: 12,
+      shareholderReturn: 48,
+      profitability: 0.096,
+      bepsScore: 0,
+    },
+    baseState: 12,
+    theory: {
+      title: '📌 La situation de référence',
+      body: `<p>Dans ce scénario de base, une entreprise minière au Burkina Faso réalise un <strong>chiffre d'affaires de 300 M</strong>, paie des charges d'exploitation (200 M) et des intérêts sur dettes (40 M). Le bénéfice imposable est de 60 M, soumis à un IS de 20%.</p>
+<p>L'État hôte perçoit <strong>12 M d'impôt</strong>. L'actionnaire étranger reçoit l'intégralité des dividendes : <strong>48 M</strong>, soit un rendement de 48% sur ses capitaux propres (100 M).</p>
+<p>Ce scénario illustre la <em>structure de référence</em> avant toute planification fiscale. Les scénarios suivants montrent comment ce même actionnaire peut légalement ou para-légalement réduire la charge fiscale de l'État hôte.</p>`,
+      refs: [
+        'Cobham, A. & Janský, P. (2018). Global distribution of revenue loss from corporate tax avoidance. <em>Journal of International Development</em>, 30(2), 206–232.',
+        'Crivelli, E., De Mooij, R. & Keen, M. (2016). Base erosion, profit shifting and developing countries. <em>FinanzArchiv</em>, 72(3), 268–301.',
+      ]
+    },
+    flowNodes: null,
+  },
+
+  {
+    id: 1,
+    key: 'pt',
+    type: 'agressive',
+    title: 'Prix de Transfert',
+    subtitle: 'Création d\'une centrale d\'achat aux Bahamas (0% d\'IS). La machine est achetée à un prix majoré de 400 au lieu de 200, gonflant les charges de la filiale locale.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Entreprise locale',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -220, cls: 'val-negative' },
+          { label: '— DAP majorée (machine 400)', value: -70, cls: 'val-negative', sub: true },
+          { label: 'Charges financières', value: -60, cls: 'val-negative' },
+          { label: 'Bénéfice avant IS', value: 20, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés', value: -4, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: 16, cls: 'val-accent', bold: true },
+        ],
+        bilan: { actif: 700, passif: 700, cp: 100, dettes: 600, machine: 400 }
+      },
+      {
+        name: 'Centrale d\'achats — Bahamas',
+        flag: '🏝️',
+        subtitle: 'Entité offshore',
+        taxBadge: 'IS 0%', taxClass: 'tax-zero',
+        rows: [
+          { label: 'CA (vente machine à prix majoré)', value: 400, cls: 'val-neutral' },
+          { label: 'Achats (prix réel)', value: -200, cls: 'val-negative' },
+          { label: 'Salaires locaux', value: -10, cls: 'val-negative' },
+          { label: 'Bénéfice avant IS', value: 190, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés (0%)', value: 0, cls: 'val-neutral' },
+          { label: 'Bénéfice net', value: 190, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: 4,
+      shareholderReturn: 206,
+      profitability: 0.023,
+      bepsScore: 8,
+    },
+    baseState: 12,
+    theory: {
+      title: '🔄 Manipulation des prix de transfert',
+      body: `<p>Les <strong>prix de transfert</strong> désignent les prix auxquels les transactions sont réalisées entre entités d'un même groupe multinational. En fixant un prix artificiellement élevé pour la machine (400 au lieu de 200), le groupe transfère 190 M de bénéfices vers les Bahamas, pays à fiscalité nulle.</p>
+<p>Conséquence : l'IS de l'État hôte chute de <strong>12 à 4 M</strong> (−67%). Le rendement de l'actionnaire passe de 48 à <strong>206 M</strong> (+329%).</p>
+<p>Selon Zucman (2014), environ <strong>40% des bénéfices des multinationales</strong> sont enregistrés dans des paradis fiscaux. Ce phénomène est particulièrement destructeur pour les pays en développement dont les recettes fiscales dépendent largement de l'IS des entreprises extractives.</p>`,
+      refs: [
+        'OCDE (2015). <em>Rapports finaux du Plan d\'action BEPS</em>. Actions 8–10 : Prix de transfert. Paris : Éditions OCDE.',
+        'Zucman, G. (2014). Taxing across borders: Tracking personal wealth and corporate profits. <em>Journal of Economic Perspectives</em>, 28(4), 121–148.',
+        'Crivelli, E., De Mooij, R. & Keen, M. (2016). Base erosion, profit shifting and developing countries. <em>FinanzArchiv</em>, 72(3), 268–301.',
+      ]
+    },
+  },
+
+  {
+    id: 2,
+    key: 'souscap',
+    type: 'agressive',
+    title: 'Sous-capitalisation',
+    subtitle: 'Financement par dettes intra-groupe : l\'actionnaire prête à l\'entreprise locale via un centre financier au Luxembourg. Les intérêts payés réduisent la base imposable.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Entreprise locale',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -200, cls: 'val-negative' },
+          { label: 'Charges financières', value: -49.9, cls: 'val-negative' },
+          { label: '— Intérêts (dettes = 499)', value: -49.9, cls: 'val-negative', sub: true },
+          { label: 'Bénéfice avant IS', value: 50.1, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés', value: -10.02, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: 40.08, cls: 'val-accent', bold: true },
+        ],
+        bilan: { actif: 500, passif: 500, cp: 1, dettes: 499, machine: 500 }
+      },
+      {
+        name: 'Centre financier — Luxembourg',
+        flag: '🇱🇺',
+        subtitle: 'Prêteur intra-groupe',
+        taxBadge: 'Rescrit fiscal', taxClass: 'tax-low',
+        rows: [
+          { label: 'Produits financiers reçus', value: 49.9, cls: 'val-positive' },
+          { label: 'Salaires', value: -1, cls: 'val-negative' },
+          { label: 'Bénéfice brut', value: 49.9, cls: 'val-positive' },
+          { label: 'IS (rescrit fiscal ≈ 0)', value: 0, cls: 'val-neutral' },
+          { label: 'Bénéfice net', value: 49.9, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: 10.02,
+      shareholderReturn: 79.98,
+      profitability: 0.08,
+      bepsScore: 6,
+    },
+    baseState: 12,
+    theory: {
+      title: '🏦 La sous-capitalisation (Thin Capitalisation)',
+      body: `<p>La <strong>sous-capitalisation</strong> consiste à financer une filiale quasi-exclusivement par des dettes intra-groupe plutôt que par des fonds propres. Dans ce scénario, les capitaux propres de l'entreprise locale tombent à <strong>1 M</strong> (contre 100 M en situation normale) pour une dette de <strong>499 M</strong>.</p>
+<p>Les intérêts versés au centre financier luxembourgeois (<strong>49,9 M</strong>) sont déductibles au Burkina Faso, réduisant la base imposable locale. Au Luxembourg, les rescrits fiscaux (<em>tax rulings</em>) garantissent une imposition quasi-nulle sur les produits financiers reçus.</p>
+<p>Ce mécanisme a fait l'objet de l'<strong>Action 4 du Plan BEPS</strong> de l'OCDE, qui recommande de limiter la déductibilité des charges d'intérêts nettes à 30% de l'EBITDA.</p>`,
+      refs: [
+        'OCDE (2015). <em>Limitation des déductions d\'intérêts et autres charges financières, Action 4 — Rapport final.</em> Paris : Éditions OCDE.',
+        'Fuest, C., Hebous, S. & Riedel, N. (2011). International debt shifting and multinationals\' firms\' debt policy. <em>Journal of Public Economics</em>, 95(11–12), 1571–1582.',
+        'Cobham, A. & Janský, P. (2018). Global distribution of revenue loss from corporate tax avoidance. <em>Journal of International Development</em>, 30(2), 206–232.',
+      ]
+    },
+  },
+
+  {
+    id: 3,
+    key: 'hedging',
+    type: 'agressive',
+    title: 'Hedging — 6ème Méthode',
+    subtitle: 'Une centrale de vente est interposée à l\'Île Maurice. Elle achète la production à un prix bas (150) et la revend au prix du marché (300), captant 149 M de marge hors de portée du fisc burkinabè.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Producteur local',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires (prix bas)', value: 150, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -200, cls: 'val-negative' },
+          { label: 'Charges financières', value: -40, cls: 'val-negative' },
+          { label: 'Bénéfice avant IS', value: -90, cls: 'val-negative' },
+          { label: 'IS (pertes = dégrèvement)', value: -18, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: -72, cls: 'val-negative', bold: true },
+        ],
+        bilan: null
+      },
+      {
+        name: 'Centrale de vente — Île Maurice',
+        flag: '🇲🇺',
+        subtitle: 'Intermédiaire commercial',
+        taxBadge: 'IS 0%', taxClass: 'tax-zero',
+        rows: [
+          { label: 'CA (vente au prix du marché)', value: 300, cls: 'val-neutral' },
+          { label: 'Achats (au producteur)', value: -150, cls: 'val-negative' },
+          { label: 'Salaires', value: -1, cls: 'val-negative' },
+          { label: 'Bénéfice avant IS', value: 149, cls: 'val-positive' },
+          { label: 'IS (0%)', value: 0, cls: 'val-neutral' },
+          { label: 'Bénéfice net', value: 149, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: -18,
+      shareholderReturn: -72,
+      profitability: -0.144,
+      bepsScore: 9,
+    },
+    baseState: 12,
+    theory: {
+      title: '📉 La 6ème méthode OCDE — Manipulation des prix des matières premières',
+      body: `<p>La <strong>6ème méthode</strong> (ou méthode de prix des matières premières) est une approche de prix de transfert spécifique aux <em>commodités</em> (or, cuivre, cacao, etc.). En vendant la production à un prix artificiellement bas à une centrale de vente offshore, l'entreprise locale déclare une <strong>perte de 90 M</strong>, supprimant toute recette fiscale.</p>
+<p>L'entreprise locale ne perçoit que 150 M pour une production valant 300 M sur le marché international. La différence (149 M) est captée par la centrale mauricienne à fiscalité nulle.</p>
+<p>Ce mécanisme est particulièrement répandu dans les secteurs miniers et agricoles en Afrique. Il a conduit plusieurs pays à adopter la règle du <em>quoted price</em> : utilisation obligatoire des cours de cotation (London Metal Exchange, etc.) comme prix de référence incontestable.</p>`,
+      refs: [
+        'OCDE (2017). <em>Transfer Pricing Guidelines for Multinational Enterprises and Tax Administrations.</em> Paris : Éditions OCDE.',
+        'Lundstøl, O., Raballand, G. & Nyirongo, F. (2013). Low government revenue from the mining sector in Zambia and Tanzania. <em>ICTD Working Paper</em>, 9.',
+        'Readhead, A. (2017). Preventing tax base erosion in Africa : a regional study of transfer pricing challenges in the mining sector. <em>Natural Resource Governance Institute</em>.',
+      ]
+    },
+  },
+
+  {
+    id: 4,
+    key: 'ras',
+    type: 'agressive',
+    title: 'Retenue à la Source (RAS)',
+    subtitle: 'Combinaison : centrale d\'achat aux Bahamas + élimination des dividendes via les bénéfices offshore. La RAS s\'applique mais est limitée par les conventions fiscales.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Entreprise locale',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -280, cls: 'val-negative' },
+          { label: '— Redevances (RAS = 60)', value: -60, cls: 'val-negative', sub: true },
+          { label: 'Charges financières', value: -60, cls: 'val-negative' },
+          { label: 'Bénéfice avant IS', value: 0, cls: 'val-neutral' },
+          { label: 'Impôt sur les sociétés', value: 0, cls: 'val-neutral' },
+          { label: 'Dividendes versés', value: 0, cls: 'val-neutral', bold: true },
+        ],
+        bilan: null
+      },
+      {
+        name: 'Centrale d\'achats — Bahamas',
+        flag: '🏝️',
+        subtitle: 'Entité offshore',
+        taxBadge: 'IS 0%', taxClass: 'tax-zero',
+        rows: [
+          { label: 'Bénéfice (redevances + marge)', value: 190, cls: 'val-positive' },
+          { label: 'IS (0%)', value: 0, cls: 'val-neutral' },
+          { label: 'Bénéfice net', value: 190, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: 60,
+      shareholderReturn: 190,
+      profitability: 0,
+      bepsScore: 7,
+    },
+    baseState: 12,
+    theory: {
+      title: '✂️ La retenue à la source (Withholding Tax)',
+      body: `<p>La <strong>retenue à la source (RAS)</strong> est un impôt prélevé sur les paiements transfrontaliers (dividendes, intérêts, redevances) avant qu'ils ne quittent le pays d'origine. Dans ce scénario, le Burkina Faso applique une RAS de <strong>15%</strong> sur les paiements à l'offshore.</p>
+<p>Toutefois, cette protection est limitée par les <em>conventions de non-double imposition</em> (CNDI). De nombreuses CNDI signées par des pays africains prévoient des taux réduits (5–10%) ou des exonérations, permettant aux groupes de contourner la RAS via des entités résidentes dans des États signataires — phénomène connu sous le nom de chalandage conventionnel (<em>treaty shopping</em>).</p>
+<p>Dans ce cas, la RAS génère <strong>60 M de recettes</strong> pour l'État (supérieur au scénario de base de 12 M), mais uniquement parce que la filiale locale a été rendue déficitaire — les recettes réelles de production s'échappent en offshore.</p>`,
+      refs: [
+        'Baker, P. (2014). An analysis of double tax treaties and their effect on foreign direct investment. <em>International Journal of the Economics of Business</em>, 21(3), 341–377.',
+        'Hearson, M. (2016). <em>Measuring tax treaty negotiation outcomes: The ActionAid Tax Treaties Dataset.</em> ICTD Working Paper 47.',
+        'OCDE (2015). <em>Neutraliser les effets des dispositifs hybrides, Action 2 — Rapport final.</em> Paris : Éditions OCDE.',
+      ]
+    },
+  },
+
+  {
+    id: 5,
+    key: 'ptsc',
+    type: 'agressive',
+    title: 'Prix de transfert + Sous-capitalisation',
+    subtitle: 'Combinaison des deux mécanismes les plus puissants : sur-facturation de la machine (400) ET financement par dettes intra-groupe (699 M). Quasi-totalité du bénéfice transférée offshore.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Entreprise locale',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -220, cls: 'val-negative' },
+          { label: '— DAP machine (400, 10 ans)', value: -70, cls: 'val-negative', sub: true },
+          { label: 'Charges financières', value: -69.9, cls: 'val-negative' },
+          { label: '— Intérêts (dettes = 699)', value: -69.9, cls: 'val-negative', sub: true },
+          { label: 'Bénéfice avant IS', value: 10.1, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés', value: -2.02, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: 8.08, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      },
+      {
+        name: 'Bahamas + Luxembourg',
+        flag: '🏝️🇱🇺',
+        subtitle: 'Entités offshore combinées',
+        taxBadge: 'IS ≈ 0%', taxClass: 'tax-zero',
+        rows: [
+          { label: 'Bénéfice centrale d\'achats', value: 190, cls: 'val-positive' },
+          { label: 'Bénéfice centre financier', value: 69.9, cls: 'val-positive' },
+          { label: 'IS total payé', value: 0, cls: 'val-neutral' },
+          { label: 'Bénéfice net combiné', value: 259.9, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: 2.02,
+      shareholderReturn: 267.98,
+      profitability: 0.012,
+      bepsScore: 10,
+    },
+    baseState: 12,
+    theory: {
+      title: '⚡ La combinaison maximale : PT + Sous-capitalisation',
+      body: `<p>Ce scénario illustre la <strong>combinaison des deux stratégies les plus utilisées</strong> par les multinationales des industries extractives. La sur-facturation de la machine (prix de transfert) gonfle les amortissements déductibles, tandis que la sous-capitalisation extrême (fonds propres = 1 M, dettes = 699 M) génère d'énormes charges d'intérêts déductibles.</p>
+<p>L'IS local tombe à <strong>2,02 M</strong> soit une réduction de <strong>−83%</strong> par rapport à la situation de référence (12 M). Le rendement total de l'actionnaire atteint <strong>267,98 M</strong> pour un investissement initial de 100 M en fonds propres.</p>
+<p>C'est précisément cette combinaison que le Plan d'action BEPS de l'OCDE cherche à neutraliser via les <em>lignes directrices sur les prix de transfert</em> (Actions 8–10) et la <em>règle de plafonnement des intérêts déductibles</em> (Action 4).</p>`,
+      refs: [
+        'OCDE (2015). <em>Rapports finaux du Plan d\'action BEPS, Actions 8–10 et Action 4.</em> Paris : Éditions OCDE.',
+        'Johannesen, N. & Zucman, G. (2014). The end of bank secrecy? An evaluation of the G20 tax haven crackdown. <em>American Economic Journal: Economic Policy</em>, 6(1), 65–91.',
+        'Janský, P. & Prats, A. (2015). International profit-shifting out of developing countries and the role of tax havens. <em>Development Policy Review</em>, 33(3), 271–292.',
+      ]
+    },
+  },
+
+  {
+    id: 6,
+    key: 'pleineconcurrence',
+    type: 'corrective',
+    title: 'Règle de Pleine Concurrence',
+    subtitle: 'L\'administration fiscale applique le prix de pleine concurrence : la machine est valorisée à 220 (prix du marché + 10% de marge). La DAP et les intérêts diminuent en conséquence.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Après correction',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -202, cls: 'val-negative' },
+          { label: '— DAP machine (220, 10 ans)', value: -52, cls: 'val-negative', sub: true },
+          { label: 'Charges financières', value: -42, cls: 'val-negative' },
+          { label: 'Bénéfice avant IS', value: 56, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés', value: -11.2, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: 44.8, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: 11.2,
+      shareholderReturn: 234.8,
+      profitability: 0.086,
+      bepsScore: 3,
+    },
+    baseState: 12,
+    theory: {
+      title: '⚖️ Le principe de pleine concurrence (Arm\'s Length)',
+      body: `<p>Le <strong>principe de pleine concurrence</strong> (arm's length principle) est le standard international de référence pour évaluer les prix de transfert. Il stipule que les transactions intra-groupe doivent être valorisées au prix qu'auraient appliqué des entreprises indépendantes dans des conditions comparables.</p>
+<p>Dans ce cas, l'administration fiscale rehausse le prix de la machine à <strong>220 M</strong> (prix du marché de 200 + marge de 10%), rejetant la sur-facturation de 400 M. L'IS récupéré est de <strong>11,2 M</strong> — proche de la situation de référence.</p>
+<p>Malgré son efficacité théorique, ce principe est difficile à appliquer dans les pays en développement qui manquent d'accès aux données de comparaison (comparables). C'est pourquoi l'OCDE développe des approches simplifiées pour les économies moins avancées.</p>`,
+      refs: [
+        'OCDE (2017). <em>Transfer Pricing Guidelines for Multinational Enterprises and Tax Administrations.</em> Paris : Éditions OCDE. §§ 1.33–1.57.',
+        'Oguttu, A.W. (2016). Tax base erosion and profit shifting in Africa — Part 2. <em>ICTD Working Paper</em>, 54.',
+        'Fuest, C. & Riedel, N. (2012). <em>Tax Evasion and Tax Avoidance: The Role of International Profit Shifting.</em> CERDI, Université Clermont Auvergne.',
+      ]
+    },
+  },
+
+  {
+    id: 7,
+    key: 'thincap',
+    type: 'corrective',
+    title: 'Règle de sous-capitalisation (Thin Capitalisation Rule)',
+    subtitle: 'Plafonnement du ratio dettes/fonds propres à 4:1. La déductibilité des intérêts est strictement limitée, réduisant l\'effet de la sous-capitalisation.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Après application de la règle de sous-capitalisation',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -200, cls: 'val-negative' },
+          { label: 'Intérêts déductibles (ratio < 4)', value: -0.4, cls: 'val-negative' },
+          { label: '— Ratio d\'endettement autorisé', value: '4:1', cls: 'val-muted', isText: true },
+          { label: 'Bénéfice avant IS', value: 99.6, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés', value: -19.92, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: 79.68, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: 19.92,
+      shareholderReturn: 70.08,
+      profitability: 0.159,
+      bepsScore: 2,
+    },
+    baseState: 12,
+    theory: {
+      title: '🔒 La règle de sous-capitalisation (Thin Capitalisation Rule)',
+      body: `<p>La <strong>règle de sous-capitalisation</strong> (<em>Thin Capitalisation Rule</em>) limite la déductibilité fiscale des intérêts intra-groupe en plafonnant le ratio dettes/fonds propres. Dans ce scénario, l'OCDE recommande un ratio maximum de <strong>4:1</strong> : pour 1 M de fonds propres, au maximum 4 M de dettes sont considérées comme fiscalement acceptables.</p>
+<p>Avec des fonds propres de 1 M, seuls <strong>4 M de dettes</strong> sont acceptables — les intérêts déductibles tombent à <strong>0,4 M</strong> au lieu de 49,9 M. L'IS de l'État hôte bondit à <strong>19,92 M</strong>, soit 66% au-dessus de la situation de référence (12 M).</p>
+<p>Cette règle, bien que puissante, présente une limite : elle peut décourager des investissements légitimes financés par emprunt. C'est pourquoi l'OCDE préfère désormais la <em>règle de plafonnement des intérêts déductibles</em> (voir scénario suivant), plus flexible.</p>`,
+      refs: [
+        'OCDE (2015). <em>Limitation des déductions d\'intérêts et autres charges financières, Action 4 — Rapport final.</em> Paris : Éditions OCDE.',
+        'Webber, S. (2010). Thin capitalization and interest deduction rules: A worldwide survey. <em>Tax Notes International</em>, 60(9), 683–708.',
+        'Heckemeyer, J.H. & Overesch, M. (2017). Multinationals\' profit response to tax differentials. <em>German Economic Review</em>, 18(1), 20–46.',
+      ]
+    },
+  },
+
+  {
+    id: 8,
+    key: 'earningstripp',
+    type: 'corrective',
+    title: 'Règle de plafonnement des intérêts déductibles',
+    subtitle: 'Plafonnement des intérêts déductibles à 30% de l\'EBITDA, conformément à l\'Action 4 BEPS. Approche plus flexible que la règle de sous-capitalisation, recommandée par l\'OCDE.',
+    entities: [
+      {
+        name: 'Mine du Burkina Faso',
+        flag: '🇧🇫',
+        subtitle: 'Après plafonnement des intérêts à 30% de l\'EBITDA',
+        taxBadge: 'IS 20%', taxClass: 'tax-high',
+        rows: [
+          { label: 'Chiffre d\'affaires', value: 300, cls: 'val-neutral' },
+          { label: 'Charges d\'exploitation', value: -200, cls: 'val-negative' },
+          { label: 'EBITDA calculé', value: 150, cls: 'val-neutral' },
+          { label: 'Intérêts déductibles (30% EBITDA)', value: -45, cls: 'val-negative' },
+          { label: '— Plafond : 30% × 150 = 45', value: '45 M', cls: 'val-muted', isText: true },
+          { label: 'Bénéfice avant IS', value: 55, cls: 'val-positive' },
+          { label: 'Impôt sur les sociétés', value: -11, cls: 'val-negative' },
+          { label: 'Bénéfice net', value: 44, cls: 'val-accent', bold: true },
+        ],
+        bilan: null
+      }
+    ],
+    kpis: {
+      stateRevenue: 11,
+      shareholderReturn: 79,
+      profitability: 0.088,
+      bepsScore: 2,
+    },
+    baseState: 12,
+    theory: {
+      title: '📐 La règle de plafonnement des intérêts déductibles — Action 4 BEPS',
+      body: `<p>La <strong>règle de plafonnement des intérêts déductibles</strong> (<em>Earning Stripping Rule</em>) limite la déductibilité des charges d'intérêts nettes à un pourcentage fixe de l'<strong>EBITDA</strong> (bénéfice avant intérêts, impôts, dépréciations et amortissements). L'OCDE recommande un taux de <strong>10% à 30%</strong>.</p>
+<p>Dans ce cas, l'EBITDA est de 150 M. Avec un plafond de 30%, seuls <strong>45 M d'intérêts</strong> sont déductibles (au lieu de 49,9 M en sous-capitalisation pure). L'IS récupéré est de <strong>11 M</strong>.</p>
+<p>Cette approche est préférée à la règle de sous-capitalisation car elle s'adapte automatiquement aux cycles économiques : en période de faible profitabilité, la base EBITDA se réduit, préservant ainsi les entreprises en situation de difficulté légitime.</p>`,
+      refs: [
+        'OCDE (2015). <em>Limitation des déductions d\'intérêts et autres charges financières, Action 4 — Rapport final.</em> Paris : Éditions OCDE.',
+        'Devereux, M.P., Fuest, C. & Lockwood, B. (2015). The taxation of foreign profits: A unified view. <em>Journal of Public Economics</em>, 125, 83–97.',
+        'Crivelli, E., De Mooij, R. & Keen, M. (2016). Base erosion, profit shifting and developing countries. <em>FinanzArchiv</em>, 72(3), 268–301.',
+      ]
+    },
+  },
+];
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let currentScenario = 0;
+let currentPhase = 1;
+
+// Simulation state
+let simState = {
+  tauxIS: 20,
+  tauxInteret: 10,
+  ptEnabled: false,
+  scEnabled: false,
+  hedgeEnabled: false,
+  rasEnabled: false,
+};
+
+// ═══════════════════════════════════════════════════════
+// INTRO
+// ═══════════════════════════════════════════════════════
+function startApp() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('mainApp').classList.remove('hidden');
+  showScenario(0);
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE SWITCHING
+// ═══════════════════════════════════════════════════════
+function switchPhase(p) {
+  currentPhase = p;
+  ['tab1','tab2','tab3'].forEach((id,i) => {
+    document.getElementById(id).classList.toggle('active', i+1 === p);
+  });
+  if (p === 1) showScenario(currentScenario);
+  else if (p === 2) renderSimulation();
+  else if (p === 3) renderComparison();
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 1 — SCENARIO RENDERING
+// ═══════════════════════════════════════════════════════
+function showScenario(idx) {
+  currentScenario = idx;
+  // update sidebar
+  for (let i = 0; i < SCENARIOS.length; i++) {
+    const btn = document.getElementById('sbn-' + i);
+    if (btn) btn.classList.toggle('active', i === idx);
+  }
+  if (currentPhase !== 1) { switchPhase(1); return; }
+
+  const s = SCENARIOS[idx];
+  const total = SCENARIOS.length;
+  const pct = ((idx + 1) / total * 100).toFixed(0);
+
+  const badgeClass = s.type === 'base' ? 'badge-base' : s.type === 'agressive' ? 'badge-agr' : 'badge-ctr';
+  const badgeLabel = s.type === 'base' ? '📊 Référence' : s.type === 'agressive' ? '⚠️ Stratégie agressive' : '🛡️ Mesure corrective BEPS';
+
+  // build entities HTML
+  let entitiesHtml = s.entities.map(e => buildEntityCard(e)).join('');
+
+  // KPI strip
+  const base = 12;
+  const stateChange = ((s.kpis.stateRevenue - base) / base * 100).toFixed(1);
+  const stateChangeCls = s.kpis.stateRevenue < base ? 'delta-neg' : 'delta-pos';
+  const stateChangeStr = s.kpis.stateRevenue < base ? `▼ ${Math.abs(stateChange)}% vs base` : `▲ ${stateChange}% vs base`;
+
+  const bepsColors = ['#22c55e','#4ade80','#84cc16','#eab308','#f97316','#ef4444','#dc2626','#b91c1c','#991b1b','#7f1d1d','#450a0a'];
+
+  let kpiHtml = `
+    <div class="kpi-strip">
+      <div class="kpi-card kpi-state">
+        <div class="kpi-label">Recettes État hôte</div>
+        <div class="kpi-value" style="color: ${s.kpis.stateRevenue < base ? 'var(--danger)' : 'var(--state)'}">${s.kpis.stateRevenue} M</div>
+        <div class="kpi-delta ${stateChangeCls}">${stateChangeStr}</div>
+      </div>
+      <div class="kpi-card kpi-corp">
+        <div class="kpi-label">Rendement actionnaire</div>
+        <div class="kpi-value">${s.kpis.shareholderReturn} M</div>
+        <div class="kpi-delta" style="color:var(--muted)">Sur 100 M investis</div>
+      </div>
+      <div class="kpi-card kpi-offshore">
+        <div class="kpi-label">Profitabilité locale</div>
+        <div class="kpi-value" style="color:${s.kpis.profitability < 0 ? 'var(--danger)' : 'var(--text)'}">${(s.kpis.profitability * 100).toFixed(1)}%</div>
+        <div class="kpi-delta" style="color:var(--muted)">Bénéfice net / CA</div>
+      </div>
+      <div class="kpi-card kpi-beps">
+        <div class="kpi-label">Indice d'érosion BEPS</div>
+        <div class="kpi-value" style="color:${bepsColors[Math.min(s.kpis.bepsScore,10)]}">${s.kpis.bepsScore}/10</div>
+        <div class="kpi-delta" style="color:var(--muted)">${s.kpis.bepsScore < 3 ? 'Érosion faible' : s.kpis.bepsScore < 6 ? 'Érosion modérée' : 'Érosion sévère'}</div>
+      </div>
+    </div>
+  `;
+
+  // Build flow diagram based on scenario
+  let flowHtml = buildFlowDiagram(s);
+
+  // Theory
+  let refsHtml = s.theory.refs.map(r => `<div class="ref-item">${r}</div>`).join('');
+  let theoryHtml = `
+    <div class="theory-box">
+      <div class="theory-title">${s.theory.title}</div>
+      <div class="theory-body">${s.theory.body}<div class="ref-list"><strong style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Références (style Harvard)</strong><br>${refsHtml}</div></div>
+    </div>
+  `;
+
+  // Navigation
+  const prevDisabled = idx === 0;
+  const nextDisabled = idx === SCENARIOS.length - 1;
+  let navHtml = `
+    <div class="nav-bar">
+      <button class="nav-btn" onclick="showScenario(${idx - 1})" ${prevDisabled ? 'disabled style="opacity:0.3;cursor:default"' : ''}>← Précédent</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;max-width:300px;margin:0 20px">
+        <span style="font-size:11px;color:var(--muted)">Scénario ${idx + 1} / ${total}</span>
+        <div class="progress-bar-outer" style="width:100%"><div class="progress-bar-inner" style="width:${pct}%"></div></div>
+      </div>
+      ${idx === total - 1
+        ? `<button class="nav-btn primary" onclick="switchPhase(2)">Accéder à la simulation →</button>`
+        : `<button class="nav-btn primary" onclick="showScenario(${idx + 1})">Suivant →</button>`}
+    </div>
+  `;
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="scenario-view fade-in">
+      <div class="scenario-header">
+        <span class="scenario-type-badge ${badgeClass}">${badgeLabel}</span>
+        <h1 class="scenario-title">${s.title}</h1>
+        <p class="scenario-subtitle">${s.subtitle}</p>
+      </div>
+      ${kpiHtml}
+      <div class="entities-grid">${entitiesHtml}</div>
+      ${flowHtml}
+      ${theoryHtml}
+      ${navHtml}
+    </div>
+  `;
+}
+
+function buildEntityCard(e) {
+  let rowsHtml = e.rows.map(r => {
+    if (r.isText) return `
+      <div class="fin-row">
+        <span class="fin-label">${r.label}</span>
+        <span class="fin-value" style="color:var(--muted)">${r.value}</span>
+      </div>`;
+    const displayVal = r.value === 0 ? '—' : (r.value > 0 ? `+${r.value} M` : `${r.value} M`);
+    const prefix = r.sub ? '&nbsp;&nbsp;·&nbsp;' : '';
+    return `
+      <div class="fin-row" style="${r.bold ? 'border-top:1px solid var(--border);margin-top:4px;padding-top:8px;' : ''}">
+        <span class="fin-label">${prefix}${r.label}</span>
+        <span class="fin-value ${r.cls}" style="${r.bold ? 'font-size:14px' : ''}">${displayVal}</span>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="entity-card">
+      <div class="entity-header">
+        <span class="entity-flag">${e.flag}</span>
+        <div>
+          <div class="entity-name">${e.name}</div>
+          <div class="entity-subtitle">${e.subtitle}</div>
+        </div>
+        <span class="entity-tax-badge ${e.taxClass}">${e.taxBadge}</span>
+      </div>
+      <div class="entity-body">${rowsHtml}</div>
+    </div>
+  `;
+}
+
+function buildFlowDiagram(s) {
+  const hasOffshore = s.entities.length > 1;
+
+  if (!hasOffshore) {
+    return `
+      <div class="flow-section">
+        <div class="flow-title"><span class="live-dot"></span>Flux financiers — Scénario ${s.id + 1}</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center;padding:10px 0">
+          <div class="flow-node" style="position:relative;border-color:var(--corp)">
+            <div class="flow-node-label">🇧🇫 Mine locale</div>
+            <div class="flow-node-value" style="color:var(--corp)">CA 300 M</div>
+            <div class="flow-node-sub">Bénéfice : ${s.entities[0].rows.find(r=>r.bold)?.value ?? '?'} M</div>
+          </div>
+          <div style="font-size:24px;color:var(--accent)">→</div>
+          <div class="flow-node" style="position:relative;border-color:var(--state)">
+            <div class="flow-node-label">🏛️ État hôte (IS)</div>
+            <div class="flow-node-value" style="color:var(--state)">${s.kpis.stateRevenue} M</div>
+            <div class="flow-node-sub">${((s.kpis.stateRevenue/300)*100).toFixed(1)}% du CA</div>
+          </div>
+          <div style="font-size:24px;color:var(--accent)">→</div>
+          <div class="flow-node" style="position:relative;border-color:var(--offshore)">
+            <div class="flow-node-label">👤 Actionnaire</div>
+            <div class="flow-node-value" style="color:var(--offshore)">${s.kpis.shareholderReturn} M</div>
+            <div class="flow-node-sub">Dividendes nets</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const offshore = s.entities[1];
+  const benfLocal = s.entities[0].rows.find(r=>r.bold)?.value ?? 0;
+  const benfOffshore = offshore.rows.find(r=>r.bold)?.value ?? 0;
+
+  return `
+    <div class="flow-section">
+      <div class="flow-title"><span class="live-dot"></span>Flux financiers — Stratégie offshore</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center;padding:10px 0;position:relative">
+        <div class="flow-node" style="border-color:var(--corp)">
+          <div class="flow-node-label">${s.entities[0].flag} ${s.entities[0].name.split('—')[0].trim()}</div>
+          <div class="flow-node-value" style="color:var(--corp)">CA 300 M</div>
+          <div class="flow-node-sub">IS payé : ${s.kpis.stateRevenue} M</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:11px;color:var(--danger)">Prix majorés ↑</span>
+          <span style="font-size:20px;color:var(--accent2)">⇄</span>
+          <span style="font-size:11px;color:var(--muted)">Flux intra-groupe</span>
+        </div>
+        <div class="flow-node" style="border-color:var(--offshore)">
+          <div class="flow-node-label">${offshore.flag} Entité offshore</div>
+          <div class="flow-node-value" style="color:var(--offshore)">${benfOffshore} M</div>
+          <div class="flow-node-sub">IS = 0</div>
+        </div>
+        <div style="font-size:20px;color:var(--accent)">→</div>
+        <div class="flow-node" style="border-color:var(--state)">
+          <div class="flow-node-label">🏛️ État hôte</div>
+          <div class="flow-node-value" style="color:var(--state)">${s.kpis.stateRevenue} M</div>
+          <div class="flow-node-sub">Perte : ${(s.kpis.stateRevenue - 12).toFixed(2)} M</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <span style="font-size:11px;color:var(--muted)">Profit global transféré offshore : </span>
+        <span style="font-family:'IBM Plex Mono',monospace;color:var(--danger);font-weight:700">${benfOffshore} M</span>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 2 — SIMULATION
+// ═══════════════════════════════════════════════════════
+function renderSimulation() {
+  // Compute results from simState
+  const res = computeSimulation();
+
+  const html = `
+    <div class="sim-view fade-in">
+      <div class="sim-header">
+        <h1 class="scenario-title">🎮 Simulation libre</h1>
+        <p class="scenario-subtitle">Ajustez les paramètres et activez des stratégies pour observer l'impact sur les recettes de l'État et la profitabilité de l'entreprise en temps réel.</p>
+      </div>
+      <div class="sim-grid">
+        <!-- Controls -->
+        <div class="controls-panel">
+          <div class="panel-title">⚙ Paramètres fondamentaux</div>
+
+          <div class="control-group">
+            <div class="control-label">
+              Taux d'IS (État hôte)
+              <span class="control-value" id="tauxIS-val">${simState.tauxIS}%</span>
+            </div>
+            <input type="range" min="5" max="40" step="1" value="${simState.tauxIS}" oninput="updateSim('tauxIS', this.value)">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px"><span>5%</span><span>40%</span></div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label">
+              Taux d'intérêt intra-groupe
+              <span class="control-value" id="tauxInteret-val">${simState.tauxInteret}%</span>
+            </div>
+            <input type="range" min="1" max="20" step="0.5" value="${simState.tauxInteret}" oninput="updateSim('tauxInteret', this.value)">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:3px"><span>1%</span><span>20%</span></div>
+          </div>
+
+          <div class="panel-title" style="margin-top:20px">⚠️ Stratégies d'optimisation</div>
+
+          <div class="strategy-toggles">
+            ${buildToggle('ptEnabled', '🔄 Prix de transfert', 'Centrale d\'achats offshore', simState.ptEnabled)}
+            ${buildToggle('scEnabled', '🏦 Sous-capitalisation', 'Centre financier au Luxembourg', simState.scEnabled)}
+            ${buildToggle('hedgeEnabled', '📉 Hedging (6e méthode)', 'Centrale de vente — Île Maurice', simState.hedgeEnabled)}
+            ${buildToggle('rasEnabled', '✂️ Retenue à la source', 'Chalandage conventionnel (treaty shopping)', simState.rasEnabled)}
+          </div>
+
+          <div style="background:var(--bg2);border-radius:8px;padding:12px;margin-top:4px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px">Recettes État (simulation)</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:700;color:${res.stateRevenue < 12 ? 'var(--danger)' : 'var(--state)'}">
+              ${res.stateRevenue.toFixed(2)} M
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">
+              Vs base : <span style="color:${res.stateRevenue < 12 ? 'var(--danger)' : 'var(--state)'}">
+                ${res.stateRevenue < 12 ? '▼' : '▲'} ${Math.abs(((res.stateRevenue - 12)/12)*100).toFixed(1)}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-panel">
+          ${buildSimWarnings(res)}
+
+          <div class="chart-section">
+            <div class="chart-title">📊 Répartition du bénéfice (M)</div>
+            <div class="bar-chart">
+              ${buildBar('État hôte (IS)', res.stateRevenue, 300, '#22c55e')}
+              ${buildBar('Actionnaire (dividendes)', res.shareholderReturn, 300, '#3b82f6')}
+              ${buildBar('Profit offshore', res.offshoreProfit, 300, '#a855f7')}
+              ${buildBar('Charges déductibles', res.deductions, 300, '#64748b')}
+            </div>
+          </div>
+
+          <div class="chart-section">
+            <div class="chart-title">📋 Conséquences détaillées</div>
+            <table class="consequences-table">
+              <thead>
+                <tr>
+                  <th>Indicateur</th>
+                  <th>Situation de base</th>
+                  <th>Votre simulation</th>
+                  <th>Variation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="${res.stateRevenue < 12 ? 'highlight' : ''}">
+                  <td>Recettes IS État hôte</td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">12 M</span></td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">${res.stateRevenue.toFixed(2)} M</span></td>
+                  <td><span class="change-badge ${res.stateRevenue < 12 ? 'badge-down' : 'badge-up'}">${res.stateRevenue < 12 ? '▼' : '▲'} ${Math.abs(((res.stateRevenue-12)/12)*100).toFixed(1)}%</span></td>
+                </tr>
+                <tr>
+                  <td>Rendement actionnaire</td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">48 M</span></td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">${res.shareholderReturn.toFixed(2)} M</span></td>
+                  <td><span class="change-badge ${res.shareholderReturn > 48 ? 'badge-down' : 'badge-up'}">${res.shareholderReturn > 48 ? '▲' : '▼'} ${Math.abs(((res.shareholderReturn-48)/48)*100).toFixed(1)}%</span></td>
+                </tr>
+                <tr>
+                  <td>Bénéfice net local</td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">48 M</span></td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">${res.localNet.toFixed(2)} M</span></td>
+                  <td><span class="change-badge ${res.localNet < 48 ? 'badge-down' : 'badge-up'}">${res.localNet < 48 ? '▼' : '▲'} ${Math.abs(((res.localNet-48)/48)*100).toFixed(1)}%</span></td>
+                </tr>
+                <tr>
+                  <td>Profit offshore capté</td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">0 M</span></td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace;color:var(--offshore)">${res.offshoreProfit.toFixed(2)} M</span></td>
+                  <td><span class="change-badge ${res.offshoreProfit > 0 ? 'badge-down' : 'badge-neutral'}">${res.offshoreProfit > 0 ? 'Offshore' : '—'}</span></td>
+                </tr>
+                <tr>
+                  <td>Indice d'érosion BEPS estimé</td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">0/10</span></td>
+                  <td><span style="font-family:'IBM Plex Mono',monospace">${res.bepsScore}/10</span></td>
+                  <td><span class="change-badge ${res.bepsScore > 0 ? 'badge-down' : 'badge-neutral'}">${res.bepsScore > 5 ? 'Sévère' : res.bepsScore > 0 ? 'Modéré' : 'Nul'}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="theory-box">
+            <div class="theory-title">💡 Interprétation pédagogique</div>
+            <div class="theory-body">
+              ${buildSimInterpretation(res)}
+              <div class="ref-list">
+                <strong style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Pour approfondir</strong><br>
+                <div class="ref-item">Crivelli, E., De Mooij, R. & Keen, M. (2016). Base erosion, profit shifting and developing countries. <em>FinanzArchiv</em>, 72(3), 268–301.</div>
+                <div class="ref-item">OCDE (2015). <em>Rapports finaux du Plan d'action BEPS — 15 actions.</em> Paris : Éditions OCDE.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('mainContent').innerHTML = html;
+}
+
+function buildToggle(key, label, sub, isOn) {
+  return `
+    <div class="toggle-item ${isOn ? 'active' : ''}" onclick="toggleStrategy('${key}')">
+      <div>
+        <div class="toggle-label">${label}</div>
+        <div class="toggle-sublabel">${sub}</div>
+      </div>
+      <div class="toggle-switch ${isOn ? 'on' : ''}" id="toggle-${key}"></div>
+    </div>
+  `;
+}
+
+function toggleStrategy(key) {
+  simState[key] = !simState[key];
+  renderSimulation();
+}
+
+function updateSim(key, val) {
+  simState[key] = parseFloat(val);
+  document.getElementById(key + '-val').textContent = key.includes('taux') ? val + '%' : val;
+  // re-compute and update results without full re-render
+  renderSimulation();
+}
+
+function computeSimulation() {
+  const IS = simState.tauxIS / 100;
+  const r = simState.tauxInteret / 100;
+
+  let ca = 300;
+  let chargesExp = 200;  // base
+  let interets = 400 * r;  // base: dettes = 400
+  let offshoreProfit = 0;
+  let bepsScore = 0;
+
+  // Prix de transfert: machine surfacturée 400 au lieu de 200
+  if (simState.ptEnabled) {
+    chargesExp += 20;  // DAP majorée (+20 par rapport à base)
+    offshoreProfit += 190;
+    interets = 600 * r;  // dettes augmentent avec la machine gonflée
+    bepsScore += 4;
+  }
+
+  // Sous-capitalisation: fonds propres = 1, dettes = 499
+  if (simState.scEnabled) {
+    interets = 499 * r;  // remplace
+    offshoreProfit += 49.9 * (r / 0.1);  // proportionnel au taux
+    bepsScore += 3;
+    if (simState.ptEnabled) {
+      interets = 699 * r;
+      offshoreProfit += 20 * (r / 0.1);
+    }
+  }
+
+  // Hedging: CA local réduit à 150
+  if (simState.hedgeEnabled) {
+    ca = 150;
+    offshoreProfit += 149;
+    bepsScore += 4;
+  }
+
+  // RAS: charges supplémentaires déductibles (redevances)
+  if (simState.rasEnabled) {
+    chargesExp += 60;
+    offshoreProfit += 60;
+    bepsScore = Math.max(bepsScore, 5);
+  }
+
+  const benefAvantIS = ca - chargesExp - interets;
+  const taxableBase = Math.max(0, benefAvantIS);
+  const IS_paid = taxableBase * IS;
+  const localNet = benefAvantIS - IS_paid;
+  const stateRevenue = IS_paid;
+  const shareholderReturn = localNet + offshoreProfit;
+
+  bepsScore = Math.min(10, bepsScore);
+
+  return {
+    stateRevenue,
+    shareholderReturn,
+    localNet,
+    offshoreProfit,
+    deductions: chargesExp + interets,
+    bepsScore,
+    benefAvantIS,
+    IS,
+    activeStrategies: [simState.ptEnabled, simState.scEnabled, simState.hedgeEnabled, simState.rasEnabled].filter(Boolean).length
+  };
+}
+
+function buildBar(label, value, max, color) {
+  const pct = Math.min(100, Math.max(0, (value / max) * 100)).toFixed(1);
+  const displayVal = value < 0 ? `${value.toFixed(1)} M` : `${value.toFixed(1)} M`;
+  return `
+    <div class="bar-row">
+      <div class="bar-label">${label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%;background:${color}">${pct > 15 ? displayVal : ''}</div>
+      </div>
+      <div class="bar-value" style="color:${color}">${displayVal}</div>
+    </div>
+  `;
+}
+
+function buildSimWarnings(res) {
+  if (res.activeStrategies === 0) return '';
+  const stateDropPct = ((12 - res.stateRevenue) / 12 * 100).toFixed(0);
+  if (res.stateRevenue >= 12) return '';
+  return `
+    <div class="warning-box">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-text">
+        <strong>Alerte BEPS :</strong> Votre combinaison de stratégies réduit les recettes de l'État hôte de <strong>${stateDropPct}%</strong> par rapport à la situation de référence. 
+        ${res.stateRevenue < 5 ? 'Le niveau actuel est inférieur au seuil critique de 5 M — cela peut déclencher un contrôle fiscal.' : ''}
+        ${res.offshoreProfit > 100 ? ` Des profits importants (${res.offshoreProfit.toFixed(0)} M) sont captés dans des territoires à fiscalité nulle ou privilégiée.` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function buildSimInterpretation(res) {
+  const strategies = [];
+  if (simState.ptEnabled) strategies.push('prix de transfert');
+  if (simState.scEnabled) strategies.push('sous-capitalisation');
+  if (simState.hedgeEnabled) strategies.push('hedging (6e méthode)');
+  if (simState.rasEnabled) strategies.push('retenue à la source');
+
+  if (strategies.length === 0) {
+    return `<p>Aucune stratégie d'optimisation activée. La situation correspond à la <strong>référence de base</strong> : l'État hôte perçoit ${res.stateRevenue.toFixed(2)} M d'IS au taux de ${simState.tauxIS}%.</p>
+    <p>Activez des stratégies dans le panneau de gauche pour observer les effets sur la répartition du bénéfice entre l'État hôte, l'actionnaire et les entités offshore.</p>`;
+  }
+
+  return `<p>Avec ${strategies.length} stratégie(s) active(s) (<strong>${strategies.join(', ')}</strong>), l'IS de l'État hôte est de <strong>${res.stateRevenue.toFixed(2)} M</strong> — ${res.stateRevenue < 12 ? `soit une réduction de ${Math.abs(((res.stateRevenue-12)/12)*100).toFixed(1)}% par rapport à la situation de référence (12 M)` : `maintenu au-dessus du niveau de référence (12 M)`}.</p>
+  <p>${res.offshoreProfit > 0 ? `<strong>${res.offshoreProfit.toFixed(2)} M</strong> de bénéfices ont été transférés vers des entités offshore à fiscalité privilégiée ou nulle.` : ''} Le rendement total de l'actionnaire atteint <strong>${res.shareholderReturn.toFixed(2)} M</strong>.</p>
+  <p>Ce type de planification illustre le phénomène d'<em>érosion de la base d'imposition et transfert de bénéfices</em> (BEPS), documenté par l'OCDE comme privant les pays en développement d'une part significative de leurs recettes fiscales (Crivelli <em>et al.</em>, 2016).</p>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// PHASE 3 — COMPARISON TABLE
+// ═══════════════════════════════════════════════════════
+function renderComparison() {
+  const rows = SCENARIOS.map(s => {
+    const typeLabel = s.type === 'base' ? '📊 Référence' : s.type === 'agressive' ? '⚠️ Agressive' : '🛡️ Corrective';
+    const typeClass = s.type === 'base' ? 'base-row' : s.type === 'agressive' ? 'agr-row' : 'ctr-row';
+    const stateDelta = ((s.kpis.stateRevenue - 12) / 12 * 100).toFixed(1);
+    const stateCls = s.kpis.stateRevenue < 12 ? 'val-negative' : 'val-positive';
+    return `
+      <tr class="${typeClass} hover-row">
+        <td>
+          <strong>${s.title}</strong><br>
+          <span style="font-size:11px;color:var(--muted)">${typeLabel}</span>
+        </td>
+        <td class="${stateCls}">${s.kpis.stateRevenue} M</td>
+        <td>${s.kpis.shareholderReturn} M</td>
+        <td>${(s.kpis.profitability * 100).toFixed(1)}%</td>
+        <td><span style="color:${s.kpis.stateRevenue < 12 ? 'var(--danger)' : 'var(--state)'}">${stateDelta > 0 ? '+' : ''}${stateDelta}%</span></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:${s.kpis.bepsScore * 12}px;height:8px;background:${s.kpis.bepsScore > 6 ? 'var(--danger)' : s.kpis.bepsScore > 3 ? 'var(--accent2)' : 'var(--state)'};border-radius:4px"></div>
+            ${s.kpis.bepsScore}/10
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const html = `
+    <div class="comparison-section fade-in">
+      <div class="scenario-header">
+        <h1 class="scenario-title">📊 Tableau comparatif — Tous les scénarios</h1>
+        <p class="scenario-subtitle">Comparaison synthétique des 9 scénarios extraits du fichier Excel. Les chiffres sont directement issus des données d'origine.</p>
+      </div>
+
+      <div class="chart-section">
+        <div class="chart-title">Recettes de l'État hôte par scénario</div>
+        <div class="bar-chart">
+          ${SCENARIOS.map(s => buildBar(s.title.substring(0,25), s.kpis.stateRevenue, 70,
+            s.type === 'base' ? '#22c55e' : s.type === 'agressive' ? '#ef4444' : '#3b82f6'
+          )).join('')}
+        </div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Scénario</th>
+              <th>Recettes État (M)</th>
+              <th>Rendement actionnaire (M)</th>
+              <th>Profitabilité locale</th>
+              <th>Δ vs base</th>
+              <th>Indice d'érosion BEPS</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+
+      <div class="theory-box">
+        <div class="theory-title">🔑 Enseignements clés</div>
+        <div class="theory-body">
+          <p>Ce tableau illustre le <strong>compromis fondamental</strong> entre l'optimisation fiscale de l'actionnaire et les recettes fiscales de l'État hôte. Dans les scénarios agressifs, chaque franc de gain additionnel pour l'actionnaire correspond à une perte fiscale pour le pays en développement.</p>
+          <p>Les mesures correctives (pleine concurrence, règle de sous-capitalisation, règle de plafonnement des intérêts déductibles) permettent de <strong>récupérer entre 85% et 166%</strong> des recettes de base. La combinaison des actions BEPS est recommandée par l'OCDE pour maximiser l'efficacité des contre-mesures dans les pays à administration fiscale limitée (Cobham & Janský, 2018).</p>
+          <div class="ref-list">
+            <strong style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Références principales</strong><br>
+            <div class="ref-item">Cobham, A. & Janský, P. (2018). Global distribution of revenue loss from corporate tax avoidance. <em>Journal of International Development</em>, 30(2), 206–232.</div>
+            <div class="ref-item">Crivelli, E., De Mooij, R. & Keen, M. (2016). Base erosion, profit shifting and developing countries. <em>FinanzArchiv</em>, 72(3), 268–301.</div>
+            <div class="ref-item">Zucman, G. (2014). Taxing across borders: Tracking personal wealth and corporate profits. <em>Journal of Economic Perspectives</em>, 28(4), 121–148.</div>
+            <div class="ref-item">OCDE (2015). <em>Rapports finaux du Plan d'action BEPS — 15 actions.</em> Paris : Éditions OCDE. Disponible sur : https://www.oecd.org/fr/fiscalite/beps/</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('mainContent').innerHTML = html;
+}
+</script>
+</body>
+</html>
