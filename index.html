@@ -604,10 +604,11 @@ body {
 
 .flow-nodes {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 0;
   flex-wrap: wrap;
   justify-content: center;
+  row-gap: 12px;
 }
 
 .flow-node {
@@ -615,7 +616,13 @@ body {
   border: 1px solid var(--border);
   padding: 14px 18px;
   text-align: center;
-  min-width: 140px;
+  min-width: 130px;
+  max-width: 180px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .flow-node-lbl {
@@ -2394,8 +2401,8 @@ function buildBalanceSheet(s) {
 
 function buildFlowDiagram(s) {
   const hasOffshore = s.entities.length > 1;
-  const localNet = s.entities[0].rows.find(r => r.bold)?.v ?? '?';
 
+  // ── Cas simple : pas d'entité offshore ──
   if (!hasOffshore) {
     return `<div class="flow-panel">
       <div class="flow-panel-title">Analyse des flux de capitaux</div>
@@ -2421,34 +2428,63 @@ function buildFlowDiagram(s) {
     </div>`;
   }
 
+  // ── Cas offshore : deux entités ──
   const offshoreEnt = s.entities[1];
   const offshoreNet = offshoreEnt.rows.find(r => r.bold)?.v ?? '?';
 
+  // Label du flux selon le type de scénario
+  const fluxLabel = s.key === 'scOn' || s.id === 2
+    ? 'Intérêts intra-groupe'
+    : s.id === 3
+    ? 'Prix sous-évalués ↓'
+    : s.id === 4
+    ? 'Redevances / RAS →'
+    : 'Prix majorés ↑';
+
+  const perte = (s.kpis.state - 30).toFixed(2);
+  const perteLabel = s.kpis.state < 30
+    ? `<span style="color:var(--red)">Perte : ${perte}$M</span>`
+    : `<span style="color:var(--green)">+${perte}$M vs. réf.</span>`;
+
   return `<div class="flow-panel">
     <div class="flow-panel-title">Flux transfrontaliers de capitaux · Structure BEPS</div>
-    <div class="flow-nodes">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0;row-gap:16px;padding:4px 0">
+
       <div class="flow-node" style="border-top:3px solid var(--navy)">
         <div class="flow-node-lbl">${s.entities[0].flag} Entité locale</div>
-        <div class="flow-node-val">$300M</div>
-        <div class="flow-node-sub">IS payé : ${s.kpis.state}$M</div>
+        <div class="flow-node-val" style="font-size:16px">CA $300M</div>
+        <div class="flow-node-sub">IS versé : ${s.kpis.cit !== undefined ? s.kpis.cit : s.kpis.state}$M</div>
       </div>
+
       <div class="flow-arrow">
         <span class="flow-arrow-line" style="color:var(--red)">⇄</span>
-        <span class="flow-arrow-label" style="color:var(--red)">Tarification intra-groupe</span>
+        <span class="flow-arrow-label" style="color:var(--red)">${fluxLabel}</span>
       </div>
+
       <div class="flow-node" style="border-top:3px solid var(--navy3)">
-        <div class="flow-node-lbl">${offshoreEnt.flag} Entité offshore</div>
-        <div class="flow-node-val" style="color:var(--navy3)">$${offshoreNet}M</div>
-        <div class="flow-node-sub">IS = 0$</div>
+        <div class="flow-node-lbl">${offshoreEnt.flag} ${offshoreEnt.name.split('—')[0].trim()}</div>
+        <div class="flow-node-val" style="color:var(--navy3);font-size:16px">${offshoreNet}$M</div>
+        <div class="flow-node-sub">IS = 0</div>
       </div>
-      <div class="flow-arrow"><span class="flow-arrow-line">→</span><span class="flow-arrow-label">Recettes fiscales</span></div>
-      <div class="flow-node" style="border-top:3px solid var(--red)">
+
+      <div class="flow-arrow">
+        <span class="flow-arrow-line">→</span>
+        <span class="flow-arrow-label">Recettes fiscales</span>
+      </div>
+
+      <div class="flow-node" style="border-top:3px solid ${s.kpis.state < 30 ? 'var(--red)' : 'var(--green)'}">
         <div class="flow-node-lbl">🏛 État hôte</div>
-        <div class="flow-node-val" style="color:var(--red)">$${s.kpis.state}M</div>
-        <div class="flow-node-sub">Perte vs. référence : ${(s.kpis.state - 30).toFixed(2)}$M</div>
+        <div class="flow-node-val" style="color:${s.kpis.state < 30 ? 'var(--red)' : 'var(--green)'};font-size:16px">${s.kpis.state}$M</div>
+        <div class="flow-node-sub">${perteLabel}</div>
       </div>
+
     </div>
-    <div class="flow-note">Bénéfices transférés offshore : <strong style="color:var(--red)">${offshoreNet}$M</strong> · Perte fiscale de l'État hôte : <strong style="color:var(--red)">${(12 - s.kpis.state).toFixed(2)}$M</strong></div>
+    <div class="flow-note">
+      Bénéfices capturés offshore : <strong style="color:var(--red)">${offshoreNet}$M</strong>
+      &nbsp;·&nbsp;
+      Perte fiscale vs. référence : <strong style="color:var(--red)">${(30 - s.kpis.state).toFixed(2)}$M</strong>
+      ${s.kpis.wht ? `&nbsp;·&nbsp; RAS perçue : <strong style="color:var(--green)">${s.kpis.wht}$M</strong>` : ''}
+    </div>
   </div>`;
 }
 
