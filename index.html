@@ -41,161 +41,438 @@ body {
   overflow-x: hidden;
 }
 
-/* ── INTRO ── */
+/* ── INTRO / NOTE PÉDAGOGIQUE ── */
 .intro {
   position: fixed; inset: 0;
   background: var(--navy);
   z-index: 300;
-  display: flex; align-items: center; justify-content: center;
-  flex-direction: column;
-  padding: 40px;
-  text-align: center;
+  overflow-y: auto;
 }
 
-.intro-logo {
-  display: flex; align-items: center; gap: 16px;
-  margin-bottom: 48px;
+.intro-topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--navy);
+  border-bottom: 3px solid var(--gold);
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 40px;
+  justify-content: space-between;
 }
 
-.imf-seal {
-  width: 72px; height: 72px;
+.intro-topbar-brand {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.intro-topbar-seal {
+  width: 32px; height: 32px;
   background: var(--gold);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Noto Serif', serif;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 7px; font-weight: 700;
   color: var(--navy);
-  letter-spacing: -1px;
+  line-height: 1.2; text-align: center;
   flex-shrink: 0;
-  border: 3px solid var(--gold2);
-  box-shadow: 0 0 0 6px rgba(200,153,42,0.2);
 }
 
-.intro-org {
-  text-align: left;
-}
-
-.intro-org-name {
+.intro-topbar-title {
   font-family: 'Noto Serif', serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--gold);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.intro-org-sub {
-  font-size: 11px;
-  color: rgba(255,255,255,0.4);
-  margin-top: 2px;
-  letter-spacing: 1px;
-}
-
-.intro-divider {
-  width: 1px; height: 48px;
-  background: rgba(255,255,255,0.15);
-}
-
-.intro-eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 18px;
-}
-
-.intro-title {
-  font-family: 'Noto Serif', serif;
-  font-size: 48px;
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 16px; font-weight: 600;
   color: white;
-  margin-bottom: 8px;
-  max-width: 640px;
 }
 
-.intro-title em { color: var(--gold2); font-style: italic; }
-
-.intro-doc-id {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 11px;
-  color: rgba(255,255,255,0.35);
-  letter-spacing: 2px;
-  margin-bottom: 32px;
-}
-
-.intro-abstract {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-left: 3px solid var(--gold);
-  border-radius: 4px;
-  padding: 22px 28px;
-  max-width: 600px;
-  text-align: left;
-  margin-bottom: 40px;
-}
-
-.abstract-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 10px;
-}
-
-.abstract-text {
-  font-family: 'Noto Serif', serif;
-  font-size: 13px;
-  color: rgba(255,255,255,0.72);
-  line-height: 1.75;
-}
-
-.abstract-text strong { color: rgba(255,255,255,0.92); }
-
-.intro-stats {
-  display: flex; gap: 40px;
-  margin-bottom: 40px;
-}
-
-.intro-stat { text-align: center; }
-.intro-stat-val {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--gold2);
-}
-.intro-stat-lbl {
-  font-size: 10px;
+.intro-topbar-title span {
   color: rgba(255,255,255,0.4);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: 4px;
+  font-weight: 400;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; margin-left: 6px;
 }
 
 .start-btn {
   background: var(--gold);
   color: var(--navy);
   border: none;
-  padding: 14px 44px;
+  padding: 10px 28px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 12px; font-weight: 700;
   cursor: pointer;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
   transition: all 0.2s;
   border-radius: 2px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  white-space: nowrap;
 }
 
 .start-btn:hover {
   background: var(--gold2);
   transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(200,153,42,0.4);
+}
+
+/* ── NOTE PÉDAGOGIQUE ── */
+.note-page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 52px 48px 100px;
+  font-family: 'Noto Serif', serif;
+  color: rgba(255,255,255,0.7);
+  font-size: 12pt;
+  line-height: 1.78;
+}
+
+.note-header {
+  border-top: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 28px 0 22px;
+  margin-bottom: 40px;
+}
+
+.note-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 8pt; font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.note-header h1 {
+  font-family: 'Noto Serif', serif;
+  font-size: 22pt; font-weight: 700;
+  line-height: 1.2; color: white;
+  margin-bottom: 14px;
+}
+
+.note-header h1 em { color: var(--gold2); font-style: italic; }
+
+.note-meta {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 8pt;
+  color: rgba(255,255,255,0.35);
+  display: flex; gap: 18px; flex-wrap: wrap;
+}
+
+.note-meta span::before { content: '·'; margin-right: 6px; color: rgba(255,255,255,0.15); }
+.note-meta span:first-child::before { content: ''; margin: 0; }
+
+.note-body p {
+  margin-bottom: 1.2em;
+  text-align: justify;
+  hyphens: auto;
+  color: rgba(255,255,255,0.65);
+}
+
+.note-body p:first-child::first-letter {
+  font-size: 3.2em; float: left;
+  line-height: 0.82;
+  margin-right: 6px; margin-top: 6px;
+  color: var(--gold);
+}
+
+.note-h2 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 8pt; font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 24px;
+  margin: 36px 0 16px;
+}
+
+.note-competences {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin: 16px 0 24px;
+}
+
+.note-comp-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  padding: 13px 16px;
+  font-size: 10.5pt;
+  color: rgba(255,255,255,0.58);
+  border-radius: 3px;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.55;
+}
+
+.note-comp-num {
+  font-size: 7.5pt; font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: block; margin-bottom: 5px;
+}
+
+.note-references {
+  margin-top: 40px; padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 10pt;
+}
+
+.note-references p {
+  margin-bottom: 0.65em;
+  text-align: left; hyphens: none;
+  padding-left: 1.8em; text-indent: -1.8em;
+  color: rgba(255,255,255,0.35);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10pt; line-height: 1.6;
+}
+
+.note-references p em { font-style: italic; }
+
+.note-cta {
+  margin-top: 56px;
+  padding: 32px 40px;
+  background: rgba(200,153,42,0.08);
+  border: 1px solid rgba(200,153,42,0.25);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.note-cta p {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 20px !important;
+  text-align: center !important;
+}
+
+.start-btn-large {
+  background: var(--gold);
+  color: var(--navy);
+  border: none;
+  padding: 15px 56px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+
+.start-btn-large:hover {
+  background: var(--gold2);
+  transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(200,153,42,0.4);
 }
+
+.note-footer {
+  margin-top: 40px; padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 8pt;
+  color: rgba(255,255,255,0.25);
+  display: flex; justify-content: space-between;
+}
+
+/* ── QUIZ ── */
+.quiz-screen {
+  position: fixed; inset: 0;
+  background: var(--navy);
+  z-index: 400;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px;
+}
+
+.quiz-card {
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  max-width: 680px; width: 100%;
+  padding: 40px 44px;
+}
+
+.quiz-topbar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.quiz-progress-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 11px; color: rgba(255,255,255,0.35);
+  letter-spacing: 0.08em; white-space: nowrap;
+}
+
+.quiz-progress-track {
+  flex: 1; height: 2px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 16px; overflow: hidden;
+}
+
+.quiz-progress-fill {
+  height: 100%; background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+.quiz-score-badge {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 11px; color: var(--gold);
+  background: rgba(200,153,42,0.12);
+  border: 1px solid rgba(200,153,42,0.25);
+  border-radius: 20px; padding: 3px 12px;
+  white-space: nowrap;
+}
+
+.quiz-multi-hint {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--blue2);
+  background: rgba(26,86,160,0.15);
+  border: 1px solid rgba(26,86,160,0.3);
+  border-radius: 2px; padding: 3px 10px;
+  margin-bottom: 14px; display: inline-block;
+}
+
+.quiz-question {
+  font-family: 'Noto Serif', serif;
+  font-size: 16px; font-weight: 400;
+  line-height: 1.55; color: white;
+  margin-bottom: 24px;
+}
+
+.quiz-options {
+  display: flex; flex-direction: column;
+  gap: 8px; margin-bottom: 28px;
+}
+
+.quiz-option {
+  display: flex; align-items: flex-start;
+  gap: 14px; padding: 12px 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px; cursor: pointer;
+  transition: all 0.15s;
+  background: rgba(255,255,255,0.03);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: rgba(255,255,255,0.6);
+  line-height: 1.5; text-align: left; width: 100%;
+}
+
+.quiz-option:hover:not(.locked) { border-color: var(--gold); color: white; background: rgba(200,153,42,0.06); }
+.quiz-option.selected { border-color: var(--gold); background: rgba(200,153,42,0.08); color: white; }
+.quiz-option.correct { border-color: var(--green2); background: rgba(26,122,74,0.1); color: #86efac; }
+.quiz-option.wrong { border-color: var(--red); background: rgba(192,57,43,0.1); color: #fca5a5; }
+.quiz-option.missed { border-color: var(--green); background: rgba(26,122,74,0.05); color: #86efac; border-style: dashed; }
+.quiz-option.locked { cursor: default; }
+
+.quiz-option-letter {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.25);
+  min-width: 18px; padding-top: 1px; flex-shrink: 0;
+}
+
+.quiz-option.selected .quiz-option-letter { color: var(--gold); }
+.quiz-option.correct .quiz-option-letter { color: var(--green2); }
+.quiz-option.wrong .quiz-option-letter { color: var(--red); }
+.quiz-option.missed .quiz-option-letter { color: var(--green); }
+
+.quiz-validate-btn {
+  background: var(--gold); color: var(--navy);
+  border: none; padding: 12px 36px;
+  border-radius: 2px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s; width: 100%;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+.quiz-validate-btn:hover:not(:disabled) { background: var(--gold2); }
+.quiz-validate-btn:disabled { opacity: 0.3; cursor: default; }
+
+.quiz-next-btn {
+  background: transparent; color: var(--gold);
+  border: 1px solid var(--gold); padding: 12px 36px;
+  border-radius: 2px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s; width: 100%;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+.quiz-next-btn:hover { background: rgba(200,153,42,0.08); }
+
+.quiz-feedback {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 3px; padding: 14px 18px;
+  margin-bottom: 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; color: rgba(255,255,255,0.55);
+  line-height: 1.6; display: none;
+}
+
+.quiz-feedback.correct-fb { border-color: rgba(26,122,74,0.4); background: rgba(26,122,74,0.06); }
+.quiz-feedback.partial-fb { border-color: rgba(200,153,42,0.35); background: rgba(200,153,42,0.05); }
+.quiz-feedback.wrong-fb { border-color: rgba(192,57,43,0.4); background: rgba(192,57,43,0.06); }
+
+.quiz-feedback-title {
+  font-weight: 700; font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 7px;
+}
+
+.correct-fb .quiz-feedback-title { color: var(--green2); }
+.partial-fb .quiz-feedback-title { color: var(--gold); }
+.wrong-fb .quiz-feedback-title { color: var(--red); }
+
+.quiz-result-card {
+  background: var(--navy2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  max-width: 520px; width: 100%;
+  padding: 48px 44px; text-align: center;
+}
+
+.quiz-result-score {
+  font-family: 'Noto Serif', serif;
+  font-size: 64px; font-weight: 700;
+  color: var(--gold); line-height: 1;
+  margin-bottom: 8px;
+}
+
+.quiz-result-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; color: rgba(255,255,255,0.35);
+  letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.quiz-result-msg {
+  font-family: 'Noto Serif', serif;
+  font-size: 16px; color: rgba(255,255,255,0.75);
+  line-height: 1.6; margin-bottom: 36px;
+}
+
+.quiz-result-btns {
+  display: flex; gap: 12px;
+}
+
+.quiz-result-btns button {
+  flex: 1; padding: 12px;
+  border-radius: 2px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+
+.btn-restart {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+}
+
+.btn-restart:hover { background: rgba(200,153,42,0.08); }
+
+.btn-return {
+  background: var(--gold);
+  color: var(--navy); border: none;
+}
+
+.btn-return:hover { background: var(--gold2); }
 
 /* ── APP SHELL ── */
 .app-shell { display: flex; flex-direction: column; min-height: 100vh; }
@@ -1470,22 +1747,89 @@ input[type="range"]::-webkit-slider-thumb {
 
 <!-- INTRO SCREEN -->
 <div id="introScreen" class="intro">
-  <div class="intro-logo">
-    <div class="imf-seal" style="font-size:10px;letter-spacing:0;line-height:1.3;text-align:center;padding:6px;">CERDI<br>Cours</div>
-    <div class="intro-divider"></div>
-    <div class="intro-org">
-      <div class="intro-org-name">CERDI · Université Clermont Auvergne</div>
+
+  <!-- Barre sticky avec bouton lancement -->
+  <div class="intro-topbar">
+    <div class="intro-topbar-brand">
+      <div class="intro-topbar-seal">CERDI<br>Cours</div>
+      <div class="intro-topbar-title">TaxShift <span>· Simulation BEPS · Afrique subsaharienne</span></div>
     </div>
+    <button class="start-btn" onclick="startApp()">Lancer la simulation →</button>
   </div>
 
-  <p class="intro-eyebrow">Simulation pédagogique · Fiscalité internationale</p>
-  <h1 class="intro-title">Érosion de la base fiscale<br>et <em>transfert de bénéfices</em></h1>
-  <div class="intro-abstract">
-    <p class="abstract-label">Résumé</p>
-    <p class="abstract-text">Cette simulation modélise <strong>trois scénarios de planification fiscale</strong> à partir d'une entreprise aurifère stylisée implantée dans un pays en développement. Les utilisateurs examinent comment les stratégies d'optimisation fiscale agressive — prix de transfert, sous-capitalisation et contrats de couverture sur matières premières — érodent les recettes de l'État hôte, et comment les contre-mesures peuvent restaurer la capacité fiscale.</p>
-  </div>
+  <!-- Note pédagogique -->
+  <div class="note-page">
 
-  <button class="start-btn" onclick="startApp()">Lancer la simulation →</button>
+    <div class="note-header">
+      <p class="note-eyebrow">Note pédagogique · Fiscalité internationale et développement · Partenariat UE–INTPA</p>
+      <h1>Présentation du jeu de simulation pédagogique sur l'<em>optimisation fiscale agressive</em></h1>
+      <div class="note-meta">
+        <span>Fiscalité internationale</span>
+        <span>Pays partenaires INTPA</span>
+        <span>Secteur extractif</span>
+        <span>Afrique subsaharienne</span>
+      </div>
+    </div>
+
+    <div class="note-body">
+
+      <div class="note-h2">1. Présentation générale</div>
+
+      <p>Les phénomènes d'érosion de la base d'imposition et de transfert de bénéfices — désignés sous l'acronyme BEPS (<em>Base Erosion and Profit Shifting</em>) — constituent un défi budgétaire structurel pour les pays partenaires d'INTPA. Crivelli, De Mooij et Keen (2016) estiment que ces pratiques coûtent aux pays en développement environ 1,3 % de leur PIB annuel en recettes perdues, soit plus du double de l'impact estimé pour les économies avancées. Ce jeu de simulation pédagogique, disponible en versions française et anglaise au contenu identique, permet d'appréhender de manière concrète et interactive les mécanismes de la planification fiscale agressive. Il est fondé sur un cas d'étude stylisé représentatif d'une entreprise minière opérant dans un pays en développement partenaire d'INTPA : l'entreprise génère un chiffre d'affaires de 300 millions d'euros et acquitte, dans la situation de référence, 12 millions d'euros d'impôt sur les sociétés au taux de 20 %. Un questionnaire d'auto-évaluation complète le dispositif.</p>
+
+      <div class="note-h2">2. Architecture du jeu</div>
+
+      <p>Le jeu s'articule en trois phases progressives. La <strong style="color:rgba(255,255,255,0.85)">Phase I — Exploration</strong> présente neuf scénarios préconstruits couvrant les principaux mécanismes d'optimisation fiscale agressive et leurs contre-mesures réglementaires : manipulation des prix de transfert, sous-capitalisation par financement intra-groupe, contrats de couverture sur matières premières (<em>hedging</em>, sixième méthode), chalandage conventionnel (<em>treaty shopping</em>), ainsi que leurs combinaisons. Les scénarios correctifs illustrent en miroir les contre-mesures du Plan d'action BEPS de l'OCDE — règle de pleine concurrence (Actions 8–10), règle de sous-capitalisation et règle du plafonnement des intérêts (Action 4). La <strong style="color:rgba(255,255,255,0.85)">Phase II — Simulation interactive</strong> invite les participants à paramétrer eux-mêmes les stratégies d'optimisation et à observer en temps réel leurs effets sur la répartition du bénéfice entre l'État hôte, l'actionnaire et les entités offshore. La <strong style="color:rgba(255,255,255,0.85)">Phase III — Comparaison</strong> synthétise l'ensemble des scénarios dans un tableau comparatif assorti d'un indice d'érosion BEPS et d'une analyse de politique fiscale.</p>
+
+      <div class="note-h2">3. Objectifs pédagogiques</div>
+
+      <p>Le jeu poursuit trois objectifs complémentaires. Il vise d'abord à <em>démystifier la technicité</em> des mécanismes BEPS, en les rendant accessibles à des publics variés — étudiants, fonctionnaires des administrations fiscales, négociateurs de conventions ou praticiens du développement. Il permet ensuite de <em>quantifier les enjeux budgétaires</em> de l'optimisation fiscale dans un contexte de dépendance aux ressources naturelles, éclairant la vulnérabilité documentée par Cobham et Janský (2018) et par Johannesen, Tørsløv et Wier (2020). Il développe enfin une capacité d'<em>évaluation des politiques publiques</em>, en permettant d'expérimenter les contre-mesures recommandées par le FMI (2014) et l'OCDE (2015) et d'en mesurer l'efficacité selon les configurations institutionnelles des pays partenaires.</p>
+
+      <div class="note-h2">4. Compétences acquises</div>
+
+      <p>À l'issue d'une session, les participants maîtrisent les compétences suivantes :</p>
+
+      <div class="note-competences">
+        <div class="note-comp-item"><span class="note-comp-num">Compétence 01 — Analyse</span>Identifier et décomposer les mécanismes d'érosion fiscale et comprendre leurs effets sur la base d'imposition de l'État source.</div>
+        <div class="note-comp-item"><span class="note-comp-num">Compétence 02 — Quantification</span>Calculer et interpréter l'impact budgétaire de chaque stratégie en termes de pertes de recettes fiscales, de transferts offshore et de rendement actionnarial.</div>
+        <div class="note-comp-item"><span class="note-comp-num">Compétence 03 — Politique fiscale</span>Évaluer l'efficacité comparée des contre-mesures BEPS en tenant compte des capacités administratives limitées des pays à faible revenu.</div>
+        <div class="note-comp-item"><span class="note-comp-num">Compétence 04 — Posture analytique</span>Adopter simultanément le point de vue de l'entreprise multinationale et celui de l'État hôte, appréhendant ainsi les asymétries d'information inhérentes à la négociation fiscale internationale.</div>
+        <div class="note-comp-item"><span class="note-comp-num">Compétence 05 — Lecture documentaire</span>Mobiliser des sources académiques et des rapports institutionnels (OCDE, FMI, Banque mondiale, Commission européenne) en lien avec les données du secteur extractif.</div>
+        <div class="note-comp-item"><span class="note-comp-num">Compétence 06 — Argumentation</span>Formuler des recommandations de politique fiscale fondées sur l'analyse des compromis entre attractivité des investissements et mobilisation des ressources domestiques.</div>
+      </div>
+
+      <p>Ces compétences correspondent aux exigences des formations de niveau master en fiscalité internationale et en économie du développement, ainsi qu'aux besoins des programmes de renforcement des capacités des administrations fiscales des pays partenaires d'INTPA, notamment ceux coordonnés par l'ATAF (<em>African Tax Administration Forum</em>) ou dans le cadre de la Plateforme de collaboration sur les questions fiscales (FMI, OCDE, ONU, Groupe de la Banque mondiale).</p>
+
+      <div class="note-h2">5. Auto-évaluation</div>
+
+      <p>Un questionnaire d'auto-évaluation complète le dispositif. Il couvre l'ensemble des mécanismes abordés dans les neuf scénarios — identification des stratégies d'optimisation, interprétation de leurs effets budgétaires, connaissance des contre-mesures réglementaires — ainsi que les références conceptuelles et institutionnelles mobilisées dans le jeu. Conçu dans un format à réponses guidées avec retour immédiat, il peut être utilisé en fin de séance dans une logique formative, ou en amont d'une formation à des fins de positionnement.</p>
+
+    </div>
+
+    <div class="note-references">
+      <div class="note-h2" style="border-top:none;padding-top:0;margin-top:0">Références</div>
+      <p>Cobham, A. et Janský, P. (2018). Global distribution of revenue loss from corporate tax avoidance. <em>Journal of International Development</em>, 30(2), 206–232.</p>
+      <p>Crivelli, E., De Mooij, R. et Keen, M. (2016). Base erosion, profit shifting and developing countries. <em>FinanzArchiv</em>, 72(3), 268–301.</p>
+      <p>Fonds monétaire international (2014). <em>Externalités en matière de fiscalité internationale des entreprises.</em> Document de politique du FMI. Washington, D.C. : FMI.</p>
+      <p>Hearson, M. (2016). <em>Measuring tax treaty negotiation outcomes: The ActionAid Tax Treaties Dataset.</em> Working Paper 47. Brighton : ActionAid International.</p>
+      <p>Johannesen, N., Tørsløv, T. et Wier, L. (2020). Are less developed countries more exposed to multinational tax avoidance? <em>Economic Policy</em>, 35(103), 457–498.</p>
+      <p>OCDE (2015). <em>Plans d'action BEPS — Rapports finaux 2015.</em> Paris : Éditions OCDE.</p>
+      <p>Readhead, A. (2016). Special rules for commodity sales: Zambia's «Sixth Method». <em>Natural Resource Governance Institute</em>. New York : NRGI.</p>
+      <p>Readhead, A. (2017). Preventing tax base erosion in Africa: Transfer pricing challenges in the mining sector. <em>Natural Resource Governance Institute</em>. New York : NRGI.</p>
+      <p>Zucman, G. (2014). Taxing across borders: Tracking personal wealth and corporate profits. <em>Journal of Economic Perspectives</em>, 28(4), 121–148.</p>
+    </div>
+
+    <div class="note-cta">
+      <p>Prêt à explorer les mécanismes d'optimisation fiscale agressive&nbsp;?</p>
+      <button class="start-btn-large" onclick="startApp()">Lancer la simulation →</button>
+    </div>
+
+    <div class="note-footer">
+      <span>Note pédagogique — Simulation fiscalité internationale</span>
+      <span>Fiscalité internationale · Partenariat UE–INTPA</span>
+    </div>
+
+  </div>
 </div>
 
 <!-- MAIN APP -->
@@ -1498,6 +1842,7 @@ input[type="range"]::-webkit-slider-thumb {
       <button class="topbar-tab" id="tab2" onclick="switchPhase(2)">II. Simulation</button>
       <button class="topbar-tab" id="tab3" onclick="switchPhase(3)">III. Comparatif</button>
     </nav>
+    <button onclick="startQuiz()" style="margin-left:16px;background:transparent;border:1px solid var(--gold);color:var(--gold);padding:6px 16px;border-radius:2px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;white-space:nowrap" onmouseover="this.style.background='rgba(200,153,42,0.1)'" onmouseout="this.style.background='transparent'">✦ Auto-évaluation</button>
   </header>
 
   <div class="app-body">
@@ -3151,6 +3496,194 @@ function renderComparison() {
             <div class="ref-entry">Zucman, G. (2014). Taxing across borders: Tracking personal wealth and corporate profits. <em>Journal of Economic Perspectives</em>, 28(4), 121–148.</div>
           </div>
         </div>
+      </div>
+    </div>`;
+}
+</script>
+<!-- ── QUIZ ── -->
+<div id="quizScreen" class="quiz-screen" style="display:none">
+  <div id="quizInner" style="width:100%;display:flex;justify-content:center"></div>
+</div>
+
+<script>
+const QUIZ = [
+  { q:"Que désigne l'acronyme BEPS ?", multi:false,
+    options:["Base Erosion and Profit Sharing","Base Erosion and Profit Shifting","Bilateral Exchange and Payment System","Budget Erosion and Public Spending"],
+    correct:[1], feedback:"BEPS signifie <em>Base Erosion and Profit Shifting</em>, soit l'érosion de la base d'imposition et le transfert de bénéfices. Ce terme désigne les stratégies fiscales exploitant les failles entre systèmes fiscaux nationaux." },
+  { q:"Lequel de ces pays est généralement considéré comme un paradis fiscal facilitant les montages BEPS ?", multi:true,
+    options:["Allemagne","Îles Caïmans","Île Maurice","Brésil","Afrique du Sud"],
+    correct:[1,2], feedback:"Les Îles Caïmans et l'Île Maurice sont deux juridictions à fiscalité réduite ou nulle fréquemment utilisées dans les montages BEPS, notamment dans le secteur extractif africain." },
+  { q:"Le principe de pleine concurrence (« arm's length ») signifie que les transactions intra-groupe doivent être réalisées :", multi:false,
+    options:["Au prix le plus avantageux pour l'actionnaire","Au prix qu'auraient pratiqué des entités indépendantes dans des conditions comparables","Au prix fixé unilatéralement par la maison mère","Au prix moyen du secteur, indépendamment des conditions de transaction"],
+    correct:[1], feedback:"Le principe de pleine concurrence, fondement des règles OCDE sur les prix de transfert (Actions 8–10), impose que les transactions entre entités liées reflètent celles qui auraient été conclues entre parties indépendantes." },
+  { q:"Quelles sont les conséquences typiques d'une manipulation des prix de transfert pour l'État hôte d'une filiale ?", multi:true,
+    options:["Une réduction de la base imposable locale","Une augmentation des recettes douanières compensant les pertes d'IS","Un transfert de bénéfices vers des juridictions à fiscalité plus faible","Une hausse du bénéfice net déclaré par la filiale locale","Une augmentation automatique de la redevance minière"],
+    correct:[0,2], feedback:"La manipulation des prix de transfert réduit la base imposable locale et transfère les bénéfices vers des juridictions à faible fiscalité, privant l'État hôte de recettes d'IS sans compensation automatique sur d'autres impôts." },
+  { q:"La sous-capitalisation consiste à :", multi:false,
+    options:["Réduire le capital social en dessous du minimum légal","Financer une filiale quasi exclusivement par des dettes intra-groupe plutôt que par des fonds propres","Délocaliser le siège social dans une juridiction à fiscalité nulle","Réduire le nombre d'actionnaires pour concentrer les dividendes"],
+    correct:[1], feedback:"La sous-capitalisation repose sur un financement majoritairement par dettes intra-groupe. Les intérêts versés, déductibles fiscalement, érodent la base imposable locale tout en transférant des revenus vers l'entité prêteuse souvent logée dans un pays à faible fiscalité." },
+  { q:"Pourquoi les intérêts versés à une entité liée dans le cadre de la sous-capitalisation réduisent-ils les recettes fiscales de l'État hôte ?", multi:false,
+    options:["Parce qu'ils sont soumis à un taux d'imposition nul dans le pays hôte","Parce qu'ils constituent des charges déductibles qui réduisent le bénéfice imposable local","Parce qu'ils remplacent les dividendes, eux-mêmes non imposables","Parce que les conventions fiscales exemptent systématiquement les flux financiers intra-groupe"],
+    correct:[1], feedback:"Les intérêts sont des charges déductibles du résultat imposable. En augmentant artificiellement l'endettement intra-groupe, le groupe réduit mécaniquement le bénéfice soumis à l'IS dans le pays hôte." },
+  { q:"Quel ratio est généralement utilisé pour mesurer le degré de sous-capitalisation d'une filiale ?", multi:false,
+    options:["Le ratio chiffre d'affaires / bénéfice net","Le ratio dettes / fonds propres","Le ratio IS payé / bénéfice avant impôt","Le ratio actifs offshore / actifs totaux"],
+    correct:[1], feedback:"Le ratio dettes/fonds propres (ou « debt-to-equity ratio ») est l'indicateur standard pour détecter la sous-capitalisation. Un ratio très élevé — parfois plusieurs centaines pour un — révèle un financement artificiel par dettes au détriment des fonds propres." },
+  { q:"Le mécanisme de couverture sur matières premières (« hedging », sixième méthode) permet à l'entreprise de :", multi:true,
+    options:["Vendre sa production à une centrale offshore à un prix inférieur au cours du marché","Transférer la marge entre prix de vente bas et prix du marché vers une entité à fiscalité réduite","Augmenter les recettes de l'État hôte grâce aux gains de change","Exonérer la filiale locale de toute retenue à la source sur les dividendes","Réduire le risque de change sans effet sur la base imposable locale"],
+    correct:[0,1], feedback:"La sixième méthode repose sur un contrat intra-groupe par lequel la filiale locale vend sa production à un prix inférieur au marché à une centrale commerciale offshore. Cette dernière capte la marge dans une juridiction à faible imposition, privant l'État hôte de recettes fiscales." },
+  { q:"Que désigne le « treaty shopping » (chalandage conventionnel) ?", multi:false,
+    options:["La négociation agressive de conventions fiscales par un État","L'utilisation d'une entité résidente dans un État signataire d'une convention favorable pour réduire les retenues à la source","L'achat de crédits d'impôt sur des marchés secondaires","La comparaison des taux d'imposition entre plusieurs pays pour choisir une implantation"],
+    correct:[1], feedback:"Le treaty shopping consiste à interposer une entité dans un État signataire d'une convention fiscale avantageuse pour bénéficier de taux réduits de retenue à la source, sans que cette entité n'y exerce d'activité substantielle réelle." },
+  { q:"Dans quel(s) cas la retenue à la source peut-elle constituer un filet de sécurité efficace pour l'État hôte ?", multi:true,
+    options:["Lorsque le taux conventionnel est suffisamment élevé pour compenser l'érosion de la base","Lorsqu'elle s'applique à des paiements sortants (intérêts, redevances, dividendes) que l'entreprise ne peut éviter","Lorsque la filiale locale est déficitaire","Lorsque le groupe bénéficie d'un rescrit fiscal dans l'État de résidence"],
+    correct:[0,1], feedback:"La retenue à la source est efficace lorsque son taux est significatif et qu'elle frappe des flux financiers inévitables. Son efficacité est en revanche limitée par les conventions fiscales qui en plafonnent le taux et par le treaty shopping." },
+  { q:"Parmi les secteurs suivants, lesquels sont particulièrement exposés aux pratiques BEPS dans les pays en développement ?", multi:true,
+    options:["Industrie minière et extractive","Télécommunications","Agriculture de subsistance","Industrie pétrolière et gazière","Artisanat local"],
+    correct:[0,1,3], feedback:"Les industries extractives (mines, pétrole, gaz) et les télécommunications sont particulièrement vulnérables au BEPS car elles concentrent des actifs de grande valeur et des flux financiers transfrontaliers importants dans des pays disposant souvent d'administrations fiscales à capacité limitée." },
+  { q:"Quelles sont les caractéristiques d'un paradis fiscal typiquement utilisé dans les montages BEPS ?", multi:true,
+    options:["Taux d'imposition nul ou très faible","Absence ou faiblesse des obligations d'échange d'informations fiscales","Taux de TVA élevé","Absence de retenue à la source sur les flux sortants","Taux d'IS supérieur à la moyenne de l'OCDE"],
+    correct:[0,1,3], feedback:"Un paradis fiscal se caractérise par une fiscalité très faible ou nulle, une opacité sur l'identité des bénéficiaires effectifs, et l'absence de retenues à la source sur les flux sortants. Ces trois caractéristiques combinées en font des destinations privilégiées pour les montages d'optimisation." },
+  { q:"Laquelle de ces caractéristiques distingue un montage de sous-capitalisation d'un financement ordinaire par emprunt ?", multi:true,
+    options:["Le prêteur est une entité liée appartenant au même groupe","Le taux d'intérêt peut être fixé au-dessus des conditions de marché pour maximiser les charges déductibles","L'emprunt est nécessairement libellé en devises étrangères","Le remboursement du principal est garanti par l'État hôte","Le prêt est systématiquement enregistré dans un paradis fiscal"],
+    correct:[0,1], feedback:"Dans un montage de sous-capitalisation, le prêteur est une entité du même groupe — ce qui permet de fixer un taux d'intérêt supérieur au marché. Un emprunt ordinaire auprès d'une banque indépendante est soumis aux conditions du marché et ne relève pas de ce mécanisme." },
+  { q:"La règle de pleine concurrence (Actions 8–10 du Plan BEPS) vise à :", multi:true,
+    options:["Aligner les bénéfices imposables sur la création de valeur réelle de chaque entité","Corriger les prix de transfert abusifs en les ramenant à des prix de marché","Supprimer l'ensemble des conventions fiscales bilatérales","Imposer un taux minimal d'IS de 20 % dans tous les pays membres de l'OCDE"],
+    correct:[0,1], feedback:"Les Actions 8–10 du Plan BEPS visent à aligner la taxation sur la création réelle de valeur et à corriger les prix de transfert artificiels. Elles ne remettent pas en cause les conventions fiscales bilatérales ni n'imposent de taux minimal d'IS." },
+  { q:"Quels sont les principaux obstacles à la mise en œuvre efficace des règles anti-BEPS dans les pays en développement ?", multi:true,
+    options:["Le manque de personnel qualifié dans les administrations fiscales","La difficulté d'accès aux informations sur les structures des groupes multinationaux","L'absence totale de conventions fiscales avec les pays développés","Le rapport de force asymétrique lors de la négociation avec les multinationales","L'interdiction faite aux pays en développement d'adhérer au cadre inclusif BEPS"],
+    correct:[0,1,3], feedback:"Les trois principaux obstacles sont le déficit de capacités techniques dans les administrations fiscales, le manque de transparence sur les structures des groupes et l'asymétrie de pouvoir de négociation entre États à faible revenu et multinationales. Les pays en développement peuvent adhérer au cadre inclusif BEPS." },
+  { q:"Qu'est-ce qu'un rescrit fiscal (« tax ruling ») tel qu'utilisé dans certains montages BEPS ?", multi:false,
+    options:["Une décision de justice annulant un redressement fiscal","Un accord préalable entre une administration fiscale et une entreprise fixant le traitement fiscal d'une opération","Une norme comptable permettant de différer la comptabilisation des bénéfices","Un mécanisme de remboursement de TVA pour les entreprises exportatrices"],
+    correct:[1], feedback:"Un rescrit fiscal est un accord préalable conclu entre une entreprise et une administration fiscale nationale, fixant à l'avance le traitement fiscal d'une opération donnée. Certains rescrits accordés par des États à fiscalité réduite ont été utilisés pour garantir une imposition quasi nulle sur des revenus financiers intra-groupe." },
+  { q:"Parmi les organisations suivantes, lesquelles font partie de la Plateforme de collaboration sur les questions fiscales dédiée aux pays en développement ?", multi:true,
+    options:["Le Fonds monétaire international (FMI)","L'OCDE","Le Groupe de la Banque mondiale","L'Organisation mondiale du commerce (OMC)","Le Programme alimentaire mondial (PAM)"],
+    correct:[0,1,2], feedback:"La Plateforme de collaboration sur les questions fiscales réunit le FMI, l'OCDE, l'ONU et le Groupe de la Banque mondiale pour coordonner l'assistance technique aux pays en développement en matière de politique et d'administration fiscales." },
+  { q:"Lequel de ces instruments constitue une contre-mesure efficace contre la sous-capitalisation ?", multi:true,
+    options:["La règle de plafonnement des intérêts nets déductibles à un pourcentage de l'EBITDA","L'imposition d'un ratio maximal dettes/fonds propres au-delà duquel les intérêts ne sont plus déductibles","L'exonération totale des dividendes intra-groupe","L'introduction d'un impôt minimal sur le chiffre d'affaires"],
+    correct:[0,1], feedback:"Deux contre-mesures sont reconnues : le plafonnement des intérêts déductibles en pourcentage de l'EBITDA (recommandé par l'Action 4 BEPS) et la règle dite « thin cap rule » imposant un ratio maximal dettes/fonds propres. Ces deux instruments limitent les charges financières déductibles artificiellement gonflées." },
+  { q:"Aucune contre-mesure isolée ne suffit à neutraliser l'ensemble des stratégies BEPS. Quelles affirmations justifient cette limite ?", multi:true,
+    options:["Les groupes multinationaux peuvent combiner plusieurs stratégies simultanément","Une règle ciblant les prix de transfert ne protège pas contre la sous-capitalisation","Les contre-mesures peuvent parfois restaurer des recettes supérieures à la situation de référence","L'application des règles BEPS est identiquement efficace dans tous les pays quelle que soit leur capacité administrative"],
+    correct:[0,1,2], feedback:"Les montages BEPS combinent souvent plusieurs mécanismes, ce qui rend inefficace toute contre-mesure isolée. En revanche, certaines règles correctrices peuvent, dans certains cas, restaurer des recettes supérieures au niveau de référence. L'efficacité varie fortement selon les capacités administratives de chaque État." },
+  { q:"Lequel de ces éléments est indispensable pour qu'une administration fiscale puisse détecter et corriger un montage de prix de transfert ?", multi:true,
+    options:["L'accès à des données de comparaison sur les prix pratiqués entre entités indépendantes","La capacité à analyser les états financiers consolidés du groupe multinational","L'existence d'une convention d'élimination de la double imposition avec tous les pays partenaires","La maîtrise des méthodes de prix de transfert reconnues par l'OCDE","Un taux d'IS supérieur à 25 %"],
+    correct:[0,1,3], feedback:"Pour détecter un prix de transfert abusif, l'administration doit disposer de données comparables sur les prix de marché, être capable d'analyser les comptes consolidés du groupe pour identifier les flux intra-groupe, et maîtriser les méthodes OCDE (comparable non contrôlé, coût majoré, prix de revente, etc.)." }
+];
+
+let quizState = { current:0, score:0, selected:[], validated:false };
+
+function startQuiz() {
+  quizState = { current:0, score:0, selected:[], validated:false };
+  document.getElementById('quizScreen').style.display = 'flex';
+  renderQuizQuestion();
+}
+
+function closeQuiz() {
+  document.getElementById('quizScreen').style.display = 'none';
+}
+
+function renderQuizQuestion() {
+  const q = QUIZ[quizState.current];
+  const idx = quizState.current;
+  const total = QUIZ.length;
+  const pct = (idx / total * 100).toFixed(0);
+  const letters = ['a','b','c','d','e'];
+
+  const optionsHtml = q.options.map((opt, i) => `
+    <button class="quiz-option" id="qopt-${i}" onclick="toggleOption(${i})">
+      <span class="quiz-option-letter">${letters[i]})</span>
+      <span>${opt}</span>
+    </button>`).join('');
+
+  document.getElementById('quizInner').innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-topbar">
+        <span class="quiz-progress-label">Question ${idx+1} / ${total}</span>
+        <div class="quiz-progress-track"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+        <span class="quiz-score-badge">${quizState.score} pt${quizState.score > 1 ? 's' : ''}</span>
+      </div>
+      ${q.multi ? '<span class="quiz-multi-hint">Plusieurs réponses possibles</span>' : ''}
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options">${optionsHtml}</div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="quiz-validate-btn" id="quizValidateBtn" onclick="validateQuiz()" disabled>Valider</button>
+    </div>`;
+  quizState.selected = [];
+  quizState.validated = false;
+}
+
+function toggleOption(i) {
+  if (quizState.validated) return;
+  const q = QUIZ[quizState.current];
+  const btn = document.getElementById('qopt-' + i);
+  if (!q.multi) {
+    quizState.selected = [i];
+    document.querySelectorAll('.quiz-option').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  } else {
+    const pos = quizState.selected.indexOf(i);
+    if (pos === -1) { quizState.selected.push(i); btn.classList.add('selected'); }
+    else { quizState.selected.splice(pos, 1); btn.classList.remove('selected'); }
+  }
+  document.getElementById('quizValidateBtn').disabled = quizState.selected.length === 0;
+}
+
+function validateQuiz() {
+  if (quizState.validated) return;
+  quizState.validated = true;
+  const q = QUIZ[quizState.current];
+  const selected = quizState.selected;
+  const correct = q.correct;
+  const isFullyCorrect = selected.length === correct.length && correct.every(c => selected.includes(c));
+  const isPartial = !isFullyCorrect && correct.some(c => selected.includes(c)) && !selected.some(s => !correct.includes(s));
+  if (isFullyCorrect) quizState.score++;
+
+  document.querySelectorAll('.quiz-option').forEach((btn, i) => {
+    btn.classList.add('locked');
+    if (correct.includes(i) && selected.includes(i)) btn.classList.add('correct');
+    else if (!correct.includes(i) && selected.includes(i)) btn.classList.add('wrong');
+    else if (correct.includes(i) && !selected.includes(i)) btn.classList.add('missed');
+  });
+
+  const fb = document.getElementById('quizFeedback');
+  fb.style.display = 'block';
+  let fbClass, fbTitle;
+  if (isFullyCorrect) { fbClass = 'correct-fb'; fbTitle = '✓ Bonne réponse'; }
+  else if (isPartial) { fbClass = 'partial-fb'; fbTitle = '◐ Réponse partielle'; }
+  else { fbClass = 'wrong-fb'; fbTitle = '✗ Réponse incorrecte'; }
+  fb.className = 'quiz-feedback ' + fbClass;
+  fb.innerHTML = `<div class="quiz-feedback-title">${fbTitle}</div>${q.feedback}`;
+
+  const btn = document.getElementById('quizValidateBtn');
+  const isLast = quizState.current === QUIZ.length - 1;
+  btn.className = 'quiz-next-btn';
+  btn.disabled = false;
+  btn.textContent = isLast ? 'Voir les résultats →' : 'Question suivante →';
+  btn.onclick = isLast ? showQuizResults : nextQuizQuestion;
+}
+
+function nextQuizQuestion() {
+  quizState.current++;
+  renderQuizQuestion();
+}
+
+function showQuizResults() {
+  const score = quizState.score;
+  const total = QUIZ.length;
+  const pct = Math.round(score / total * 100);
+  let msg;
+  if (pct >= 85) msg = "Excellente maîtrise des mécanismes BEPS et des politiques fiscales internationales.";
+  else if (pct >= 65) msg = "Bonne compréhension globale. Quelques mécanismes méritent d'être approfondis.";
+  else if (pct >= 45) msg = "Des bases solides, mais plusieurs notions clés restent à consolider.";
+  else msg = "Une nouvelle session de simulation vous permettra de renforcer vos acquis.";
+
+  document.getElementById('quizInner').innerHTML = `
+    <div class="quiz-result-card">
+      <div class="quiz-result-score">${score}<span style="font-size:32px;color:rgba(255,255,255,0.25)">/${total}</span></div>
+      <div class="quiz-result-label">${pct} % de bonnes réponses</div>
+      <div class="quiz-result-msg">${msg}</div>
+      <div class="quiz-result-btns">
+        <button class="btn-restart" onclick="startQuiz()">↺ Recommencer</button>
+        <button class="btn-return" onclick="closeQuiz()">Retour au jeu →</button>
       </div>
     </div>`;
 }
